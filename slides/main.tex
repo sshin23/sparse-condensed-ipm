@@ -1,0 +1,85 @@
+% \input{preamble}
+
+\title{{\bfseries Sparse Condensed-Space Interior-Point Methods with Elastic Relaxations on GPUs: Will it Work?}}
+
+\graphicspath{}
+
+\author[Sungho Shin]{
+  Sungho Shin\\
+  {\normalfont\footnotesize\url{sshin@anl.gov}}
+}
+\subtitle{}
+\institute[ANL/MCS]{
+  Argonne National Laboratory
+}
+
+\begin{document}
+
+{
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
+  \frame[noframenumbering,plain]{
+    \titlepage
+    \vspace{-.7in}
+  }
+}
+
+\begin{frame}{A Naive Approach Doesn't Work.}
+  We solve the KKT system within IPM using sparse LU solver in \texttt{CUSOLVERRF}.
+
+  \begin{itemize}
+  \item Symbolic factorization needs to be performed every 
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}{Key Idea}
+  Consider an NLP of the following form: 
+  \begin{align*}
+    \mathop{\text{min}}_{x^L\leq x\leq x^U}\;& f(x)\;\\
+    \st\;&c(x) = 0.
+  \end{align*}
+  The problem is relaxed via {\it elastic relaxation}:
+  \begin{align*}
+    \mathop{\text{min}}_{x^L\leq x\leq x^U, s}\;& f(x)\;\\
+    \st\;& 0\leq c(x) + s\leq \epsilon_{\text{ER}},
+  \end{align*}
+  where $\epsilon_{\text{ER}}\approx \sqrt{\epsilon_{\text{mach}}}$.
+
+  We now observe that the problem has {\it inequality constriants only}. This allows us to apply the {\it condensation strategy}:
+  \begin{align*}
+    \begin{bmatrix}
+      H + \Sigma_x & &J^\top \\
+      & \Sigma_s &I \\
+      J & I &\\
+    \end{bmatrix}
+    \begin{bmatrix}
+      p^u \\ p^s \\ p^\lambda
+    \end{bmatrix}  = -
+    \begin{bmatrix}
+      r_1 \\ r_2 \\ r_3 ,
+    \end{bmatrix}
+    \iff \left(H + \Sigma_x+ J^\top \Sigma_s J \right) p^u = -r_1 + J r_2 - J^\top \Sigma_s r_3.
+  \end{align*}
+  Of course, $J^\top \Sigma_s J$ can be arbitrarily dense, but our favorite problems will still be sparse.
+\end{frame}
+
+\begin{frame}{What do we need for Portabiltiy?}
+  \begin{itemize}
+  \item All we need is a sparse Cholesky solver (preferrably, written in {\tt KernelAbstractions.jl}).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Schur Complement as ``Bandwidth Thickening''}
+  
+\end{frame}
+
+{
+  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
+  \frame[noframenumbering,plain]{
+    \titlepage
+    \vspace{-.7in}
+  }
+}
+
+
+\end{document}
+
