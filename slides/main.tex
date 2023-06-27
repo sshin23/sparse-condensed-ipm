@@ -1,4 +1,4 @@
-% \input{preamble}
+\input{preamble}
 
 \title{{\bfseries Sparse Condensed-Space Interior-Point Methods with Inequality Relaxations on GPUs: Will it Work?}}
 
@@ -16,7 +16,7 @@
 \begin{document}
 
 {
-  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
+  % \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
   \frame[noframenumbering,plain]{
     \titlepage
     \vspace{-.7in}
@@ -122,7 +122,7 @@
   \item With inequality relaxation, can solve {\tt case9241} up to ${\tt tol} = 10^{-7}$, but requires long iterative refinement. Convergence up to $10^{-5}$ is reliable/efficient.
   \item Numerical results (w/ linear algebra/AD on GPU) for {\tt case9241}:
     \begin{center}
-      \includegraphics[width=.8\textwidth]{result.png}
+      \includegraphics[width=.8\textwidth]{../fig/result-6-27.png}
     \end{center}
     \begin{itemize}
     \item Linear Sovler: only 0.708 secs out of 4.408 secs are spent on GPU.
@@ -136,7 +136,7 @@
 \end{frame}
 
 {
-  \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
+  % \usebackgroundtemplate{\includegraphics[width=\paperwidth]{TitleANLBlue}}
   \frame[noframenumbering,plain]{
     \titlepage
     \vspace{-.7in}
