@@ -1,6 +1,6 @@
 % \input{preamble}
 
-\title{{\bfseries Sparse Condensed-Space Interior-Point Methods with Elastic Relaxations on GPUs: Will it Work?}}
+\title{{\bfseries Sparse Condensed-Space Interior-Point Methods with Inequality Relaxations on GPUs: Will it Work?}}
 
 \graphicspath{}
 
@@ -23,26 +23,39 @@
   }
 }
 
-\begin{frame}{A Naive Approach Doesn't Work.}
-  We solve the KKT system within IPM using sparse LU solver in \texttt{CUSOLVERRF}.
-
+\begin{frame}{Executive Summary}
   \begin{itemize}
-  \item Symbolic factorization needs to be performed every 
+  \item We exmaine the potential benefit of sparse condensed-space interior-point methods with inequality relaxations, with the goal of solving general large-scale NLPs on GPUs.
+  \item The proposed method relaxes the equality constraints as inequality constraints by replacing $c(x) =0$ by $c(x)+ s=0$ and $0\leq s\leq\epsilon_{\text{IR}}$.
+  \item The resulting inequality-constrained NLP is solved with sparse condensed-space interior-point method, which requires solving a sparse positive definite system.
+  \item While the LU solver in CUSOLVERRF cannot handle the sparse indefinite systems wihtin IPM, it can handle the sparse PD systems up to a certain accuracy ($\epsilon_{\text{IR}}=\texttt{tol} = 10^{-3}$).
+  \item For portability, we will still need a sparse Cholesky solver running on GPU.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Naive Approach Doesn't Work.}
+  \begin{itemize}
+  \item Can we solve the indefinite KKT systems using sparse LU solver in \texttt{CUSOLVERRF}? No.
+    \begin{center}
+      \includegraphics[width=.5\textwidth]{../fig/linear_solvers.pdf}  
+    \end{center}   
+  \item Symbolic factorization needed every several iterations (every 3 for above case).
+  \item Numeric factorization is not fast.
   \end{itemize}  
 \end{frame}
 
-\begin{frame}{Key Idea}
+\begin{frame}{Condensed Approach}
   Consider an NLP of the following form: 
   \begin{align*}
     \mathop{\text{min}}_{x^L\leq x\leq x^U}\;& f(x)\;\\
     \st\;&c(x) = 0.
   \end{align*}
-  The problem is relaxed via {\it elastic relaxation}:
+  The problem is relaxed via {\it inequality relaxation}:
   \begin{align*}
-    \mathop{\text{min}}_{x^L\leq x\leq x^U, s}\;& f(x)\;\\
-    \st\;& 0\leq c(x) + s\leq \epsilon_{\text{ER}},
+    \mathop{\text{min}}_{x^L\leq x\leq x^U, 0\leq s \leq \epsilon_{\text{IR}}}\;& f(x)\;\\
+    \st\;& c(x) + s= 0,
   \end{align*}
-  where $\epsilon_{\text{ER}}\approx \sqrt{\epsilon_{\text{mach}}}$.
+  where $\epsilon_{\text{IR}}\approx\texttt{tol}$.
 
   We now observe that the problem has {\it inequality constriants only}. This allows us to apply the {\it condensation strategy}:
   \begin{align*}
@@ -59,17 +72,67 @@
     \end{bmatrix}
     \iff \left(H + \Sigma_x+ J^\top \Sigma_s J \right) p^u = -r_1 + J r_2 - J^\top \Sigma_s r_3.
   \end{align*}
-  Of course, $J^\top \Sigma_s J$ can be arbitrarily dense, but our favorite problems will still be sparse.
+  Of course, $J^\top \Sigma_s J$ can be arbitrarily dense, but our favorite problems (e.g., OPF) will still be sparse.
+\end{frame}
+
+\begin{frame}{Effects of Inequality Relaxation}
+  \includegraphics[width=.32\textwidth]{../fig/iter.pdf}
+  \includegraphics[width=.32\textwidth]{../fig/objval.pdf}
+  \includegraphics[width=.32\textwidth]{../fig/cvio.pdf}
+  \begin{itemize}
+  \item $\epsilon_{\text{IR}}=10^{-8}$
+  \item Number of iterations increased (5--50\%).
+  \item Not much difference in the quality of solution (obj value/constraint violation).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Will it be Efficient?}
+  \begin{itemize}
+  \item We do this experiment to better evaluate the potential benefit of the proposed strategy.
+  \item We take the KKT system from the iterates obtained from MadNLP+Ma57 and solve it with CUSOLVER. We aim to check:
+    \begin{itemize}
+    \item Symbolic factorization can be reused between iterations.
+    \item Numeric factorization/backsolve is fast/precise enough. 
+    \end{itemize}
+    \begin{center}
+      \includegraphics[width=.5\textwidth]{../fig/hypo.pdf}  
+    \end{center}
+  \item Observation: factorization/backsolve is precise/efficient enough for $\epsilon_{\text{IR}}=\texttt{tol} = 10^{-3}$.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{What do we need for Portabiltiy?}
   \begin{itemize}
-  \item All we need is a sparse Cholesky solver (preferrably, written in {\tt KernelAbstractions.jl}).
+  \item For now, the sparse LU solver in CUSOLVERRF can do the job.
+  \item For portability, all we need is a sparse Cholesky solver (preferrably, written in {\tt KernelAbstractions.jl}).
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Schur Complement as ``Bandwidth Thickening''}
-  
+% \begin{frame}{Schur Complement as ``Bandwidth Thickening''}
+%   \begin{itemize}
+%   \item Directly solving large-scale 
+%   \item Can be applied to any graph-structured sparse systems.
+%   \end{itemize}
+% \end{frame}
+
+% \def\checkmark{$\text{\rlap{$\checkmark$}}\square$} 
+\begin{frame}{Current Status (6/27/2023)}
+  \begin{itemize}
+  \item SparseCondensedKKTSystem works on CPU.
+  \item With inequality relaxation, can solve {\tt case9241} up to ${\tt tol} = 10^{-7}$, but requires long iterative refinement. Convergence up to $10^{-5}$ is reliable/efficient.
+  \item Numerical results (w/ linear algebra/AD on GPU) for {\tt case9241}:
+    \begin{center}
+      \includegraphics[width=.8\textwidth]{result.png}
+    \end{center}
+    \begin{itemize}
+    \item Linear Sovler: only 0.708 secs out of 4.408 secs are spent on GPU.
+    \item AD: only 0.104 secs out of 0.660 secs are spent on GPU.
+    \item MadNLP: operations like $y \leftarrow y + ax$ are $\times 10$ faster on GPUs.
+    \end{itemize}  
+  \item By running everything on GPUs, we may solve {\tt case9241} in less than 4 secs (JuMP+Ipopt takes 40 secs).
+  \item The group in LLNL may be looking at the same problem (based on their activities on Github).
+  \item Implement the GPU version (2-3 weeks of work) and submit this to for PSCC next year?
+\end{itemize}
 \end{frame}
 
 {
@@ -82,4 +145,5 @@
 
 
 \end{document}
+
 
