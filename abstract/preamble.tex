@@ -1,4 +1,29 @@
-\documentclass{article} 
+\documentclass{IEEEtran4PSCC}
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% Set footer
+\makeatletter
+\let\old@ps@headings\ps@headings
+\let\old@ps@IEEEtitlepagestyle\ps@IEEEtitlepagestyle
+\def\psccfooter#1{%
+    \def\ps@headings{%
+        \old@ps@headings%
+        \def\@oddfoot{\strut\hfill#1\hfill\strut}%
+        \def\@evenfoot{\strut\hfill#1\hfill\strut}%
+    }%
+    \def\ps@IEEEtitlepagestyle{%
+        \old@ps@IEEEtitlepagestyle%
+        \def\@oddfoot{\strut\hfill#1\hfill\strut}%
+        \def\@evenfoot{\strut\hfill#1\hfill\strut}%
+    }%
+    \ps@headings%
+}
+\makeatother
+
+\psccfooter{%
+        \parbox{\textwidth}{\hrulefill \\ \small{23rd Power Systems Computation Conference} \hfill \begin{minipage}{0.2\textwidth}\centering \vspace*{4pt} \includegraphics[scale=0.06]{PSCC_logo.png}\\\small{PSCC 2024} \end{minipage} \hfill \small{Paris, France --- June 4 -- 7, 2024}}%
+}
 
 \usepackage{amsmath,amssymb,amsthm,amsfonts} % assumes amsmath package installed
 \usepackage[linktocpage=true,colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -93,14 +118,14 @@
 \newcommand{\cT}{\mathcal{T}}
 \newcommand{\interior}{\mathop{\text{\normalfont interior}}}
 \newcommand{\relint}{\mathop{\text{\normalfont relint}}}
-\newcommand{\vertices}{\mathop{\text{\normalfont vertices}}} 
+\newcommand{\vertices}{\mathop{\text{\normalfont vertices}}}
 \sloppy
 \usepackage{graphicx}
 
-\usepackage{enumitem} 
+\usepackage{enumitem}
 \usepackage{mathtools}
 \allowdisplaybreaks
-\renewcommand{\theenumi}{(\alph{enumi})} 
+\renewcommand{\theenumi}{(\alph{enumi})}
 \usepackage{parskip}
 
 \usepackage{tikz}
