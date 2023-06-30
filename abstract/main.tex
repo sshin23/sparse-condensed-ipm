@@ -24,13 +24,13 @@ We present a comprehensive computational framework and the associated software i
 
 Furthermore, by leveraging the SIMD abstraction of nonlinear programs, which preserves the parallelizable structure in the model, the model functions and derivative evaluations can be parallelized, facilitating evaluations on the GPU. We show that the AC power flow model is particularly well-suited for this abstraction, as it involves repetitive expressions for each component of the model (e.g., buses, lines, generators), and the number of computational patterns does not increase with the network's size. As observed by the impressive performance of Gravity \cite{hijazi2018gravity}, exploiting this structure significantly accelerates model function and derivative evaluations.
 
-We will present comprehensive numerical benchmark results to demonstrate the efficiency of our proposed approach. The proposed method is implemented in our packages, MadNLP.jl and SIMDiff.jl, with the solution of the KKT system being carried out using the external CUSOLVER library. We compare our method against the standard CPU approach \cite{wachter2006implementation} and the recently developed reduced-space interior-point method on GPUs \cite{pacaud2022condensed} using the standard benchmark library \cite{pglib}. Our initial results suggest that the proposed framework has the potential to accelerate the solution of AC OPF problems by an order of magnitude compared to existing tools, such as Ipopt (interfaced with MATPOWER or PowerModels.jl), especially for large-scale instances, up to moderate tolerances ($10^{-6}$). We also discuss the future extensibility of our method for more complex optimization tasks, such as multi-period, security-constrained, and joint transmission-distribution optimization.
+We will present comprehensive numerical benchmark results to demonstrate the efficiency of our proposed approach. The proposed method is implemented in our packages, MadNLP.jl and SIMDiff.jl, with the solution of the KKT system being carried out using the external CUSOLVER library. We compare our method using the standard benchmark library \cite{pglib} against the standard CPU approach \cite{wachter2006implementation} and the recently developed reduced-space interior-point method on GPUs \cite{pacaud2022condensed} . Our initial results suggest that the proposed framework has the potential to accelerate the solution of AC OPF problems by an order of magnitude compared to existing tools, such as Ipopt (interfaced with MATPOWER or PowerModels.jl), especially for large-scale instances, up to moderate tolerances ($10^{-6}$). We also discuss the future extensibility of our method for more complex optimization tasks, such as multi-period, security-constrained, and joint transmission-distribution optimization.
 
-\pagebreak
+\newpage
 
 \bibliographystyle{plain}
 \bibliography{main}
 
 \end{document}
 
- 
+
