@@ -1,0 +1,162 @@
+% Recommended preamble:
+% \usetikzlibrary{arrows.meta}
+% \usetikzlibrary{backgrounds}
+% \usepgfplotslibrary{patchplots}
+% \usepgfplotslibrary{fillbetween}
+% \pgfplotsset{%
+%     layers/standard/.define layer set={%
+%         background,axis background,axis grid,axis ticks,axis lines,axis tick labels,pre main,main,axis descriptions,axis foreground%
+%     }{
+%         grid style={/pgfplots/on layer=axis grid},%
+%         tick style={/pgfplots/on layer=axis ticks},%
+%         axis line style={/pgfplots/on layer=axis lines},%
+%         label style={/pgfplots/on layer=axis descriptions},%
+%         legend style={/pgfplots/on layer=axis descriptions},%
+%         title style={/pgfplots/on layer=axis descriptions},%
+%         colorbar style={/pgfplots/on layer=axis descriptions},%
+%         ticklabel style={/pgfplots/on layer=axis tick labels},%
+%         axis background@ style={/pgfplots/on layer=axis background},%
+%         3d box foreground style={/pgfplots/on layer=axis foreground},%
+%     },
+% }
+
+\begin{tikzpicture}[/tikz/background rectangle/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, draw opacity={1.0}}, show background rectangle]
+\begin{axis}[point meta max={nan}, point meta min={nan}, legend cell align={left}, legend columns={1}, title={}, title style={at={{(0.5,1)}}, anchor={south}, font={{\fontsize{14 pt}{18.2 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}, align={center}}, legend style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid, fill={rgb,1:red,1.0;green,1.0;blue,1.0}, fill opacity={1.0}, text opacity={1.0}, font={{\fontsize{8 pt}{10.4 pt}\selectfont}}, text={rgb,1:red,0.0;green,0.0;blue,0.0}, cells={anchor={center}}, at={(0.02, 0.98)}, anchor={north west}}, axis background/.style={fill={rgb,1:red,1.0;green,1.0;blue,1.0}, opacity={1.0}}, anchor={north west}, xshift={1.0mm}, yshift={-1.0mm}, width={150.4mm}, height={99.6mm}, scaled x ticks={false}, xlabel={number of variables}, x tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, x tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, xlabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{11 pt}{14.3 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, xmode={log}, log basis x={10}, xmajorgrids={true}, xmin={1042}, xmax={208624}, xticklabels={{$10^{4}$,$10^{5}$}}, xtick={{10000.0,100000.0}}, xtick align={inside}, xticklabel style={font={{\fontsize{8 pt}{10.4 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, x grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, xticklabel pos={left}, x axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, scaled y ticks={false}, ylabel={speedup}, y tick style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}}, y tick label style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, opacity={1.0}, rotate={0}}, ylabel style={at={(ticklabel cs:0.5)}, anchor=near ticklabel, at={{(ticklabel cs:0.5)}}, anchor={near ticklabel}, font={{\fontsize{11 pt}{14.3 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, ymode={log}, log basis y={10}, ymajorgrids={true}, ymin={0.042449470320200695}, ymax={37.677607781546705}, yticklabels={{$10^{-1}$,$10^{0}$,$10^{1}$}}, ytick={{0.1,1.0,10.0}}, ytick align={inside}, yticklabel style={font={{\fontsize{8 pt}{10.4 pt}\selectfont}}, color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, rotate={0.0}}, y grid style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={0.1}, line width={0.5}, solid}, yticklabel pos={left}, y axis line style={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, line width={1}, solid}, colorbar={false}]
+    \addplot[color={rgb,1:red,0.0;green,0.6056;blue,0.9787}, name path={90991ba5-e570-4efd-b7ef-9814b55ce668}, only marks, draw opacity={1.0}, line width={0}, solid, mark={*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.0;green,0.6056;blue,0.9787}, fill opacity={0.0}, line width={0.75}, rotate={0}, solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1042.0  0.12132541013470992  \\
+            1468.0  0.10314692434543314  \\
+            4254.0  0.3591290345722146  \\
+            5432.0  0.4318689855256274  \\
+            11192.0  0.493180776719653  \\
+            17128.0  0.800124080241001  \\
+            19008.0  0.9921851426883461  \\
+            23238.0  1.0782015249239902  \\
+            24540.0  1.2249585614191905  \\
+            25086.0  1.0314377489080664  \\
+            35270.0  1.8122793796033891  \\
+            36696.0  1.9603940524376853  \\
+            37872.0  1.8070726670030763  \\
+            38814.0  1.908074706072124  \\
+            41398.0  1.727056190842467  \\
+            42532.0  1.8603003250968289  \\
+            76804.0  3.761460351555901  \\
+            78748.0  1.5909204206596708  \\
+            83572.0  2.421056606260939  \\
+            85568.0  2.4138090392087532  \\
+            96750.0  1.3842870098320392  \\
+            117370.0  2.213283662070483  \\
+            179562.0  2.511302487858865  \\
+            203374.0  0.5769039469634973  \\
+            208624.0  4.274713987006297  \\
+        }
+        ;
+    \addlegendentry {total solution}
+    \addplot[color={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, name path={45fed1e9-b750-4c50-97d6-e4d2ebf7d495}, only marks, draw opacity={1.0}, line width={0}, solid, mark={square*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.8889;green,0.4356;blue,0.2781}, fill opacity={0.0}, line width={0.75}, rotate={0}, solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1042.0  0.1489498744199213  \\
+            1468.0  0.1727159137624846  \\
+            4254.0  0.4340465934605082  \\
+            5432.0  0.5434423830639694  \\
+            11192.0  0.8004594515472352  \\
+            17128.0  2.082689485354689  \\
+            19008.0  2.4770197579261883  \\
+            23238.0  3.05899341669706  \\
+            24540.0  1.8717332637281556  \\
+            25086.0  2.906247958020815  \\
+            35270.0  4.496479681105164  \\
+            36696.0  3.995367978071199  \\
+            37872.0  5.152797200922378  \\
+            38814.0  4.421274460394101  \\
+            41398.0  4.854859953917821  \\
+            42532.0  4.4411634259064  \\
+            76804.0  11.566047092387956  \\
+            78748.0  5.45272118651195  \\
+            83572.0  6.085193656249472  \\
+            85568.0  6.910004676366815  \\
+            96750.0  6.369970804347526  \\
+            117370.0  6.95452612891449  \\
+            179562.0  10.976999346486657  \\
+            203374.0  18.838803890773352  \\
+            208624.0  12.675774859535938  \\
+        }
+        ;
+    \addlegendentry {AD}
+    \addplot[color={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, name path={597ac343-eab2-47fd-bfb0-3d1869cc7b86}, only marks, draw opacity={1.0}, line width={0}, solid, mark={diamond*}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.2422;green,0.6433;blue,0.3044}, fill opacity={0.0}, line width={0.75}, rotate={0}, solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1042.0  0.12134780833101436  \\
+            1468.0  0.08489894064040139  \\
+            4254.0  0.3400556528465654  \\
+            5432.0  0.4015885378861249  \\
+            11192.0  0.4178468802690407  \\
+            17128.0  0.6671440282545749  \\
+            19008.0  0.8418469098787906  \\
+            23238.0  0.8970213864029066  \\
+            24540.0  1.1302597892149948  \\
+            25086.0  0.8736098235492576  \\
+            35270.0  1.6332401723649006  \\
+            36696.0  1.8665104859925663  \\
+            37872.0  1.5712590526539294  \\
+            38814.0  1.7310996666393024  \\
+            41398.0  1.5290569916050272  \\
+            42532.0  1.7474748794876105  \\
+            76804.0  3.488972057355353  \\
+            78748.0  1.395946330507901  \\
+            83572.0  2.3246624958297284  \\
+            85568.0  2.2224099048005086  \\
+            96750.0  1.2509789777402023  \\
+            117370.0  2.0490766644040312  \\
+            179562.0  2.389075257357081  \\
+            203374.0  0.48297264689483094  \\
+            208624.0  4.199296385639948  \\
+        }
+        ;
+    \addlegendentry {linear solver}
+    \addplot[color={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, name path={0daca70f-5467-4208-80b3-fa1e8e4d7149}, only marks, draw opacity={1.0}, line width={0}, solid, mark={star}, mark size={3.0 pt}, mark repeat={1}, mark options={color={rgb,1:red,0.0;green,0.0;blue,0.0}, draw opacity={1.0}, fill={rgb,1:red,0.7644;green,0.4441;blue,0.8243}, fill opacity={0.0}, line width={0.75}, rotate={0}, solid}]
+        table[row sep={\\}]
+        {
+            \\
+            1042.0  0.11053845268205038  \\
+            1468.0  0.18528018635787544  \\
+            4254.0  0.3971318279284334  \\
+            5432.0  0.502547137067705  \\
+            11192.0  0.7925028620399515  \\
+            17128.0  1.4642569252535946  \\
+            19008.0  1.5724747212032781  \\
+            23238.0  1.8834530645984655  \\
+            24540.0  1.588367729468711  \\
+            25086.0  1.6835889681072704  \\
+            35270.0  2.4543461608339245  \\
+            36696.0  2.2839061860763974  \\
+            37872.0  2.5758891325324624  \\
+            38814.0  2.548435587364985  \\
+            41398.0  2.5197402455776663  \\
+            42532.0  2.2091833306911117  \\
+            76804.0  4.095029335003687  \\
+            78748.0  2.4198733504538077  \\
+            83572.0  2.638122640974531  \\
+            85568.0  2.8374797565002723  \\
+            96750.0  2.5465858998015847  \\
+            117370.0  2.5350811531961326  \\
+            179562.0  3.059535361656725  \\
+            203374.0  3.8895762766124165  \\
+            208624.0  3.6340740717834334  \\
+        }
+        ;
+    \addlegendentry {solver internal}
+    \addplot[color={rgb,1:red,0.502;green,0.502;blue,0.502}, name path={8f65f3c3-f37c-42b0-ad0a-2ff41a891b22}, draw opacity={1.0}, line width={1}, solid, forget plot]
+        table[row sep={\\}]
+        {
+            \\
+            5.204406012731031  1.0  \\
+            4.1769648153550915e7  1.0  \\
+        }
+        ;
+\end{axis}
+\end{tikzpicture}

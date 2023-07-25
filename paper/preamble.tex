@@ -126,6 +126,61 @@
 \usepackage{mathtools}
 \allowdisplaybreaks
 \renewcommand{\theenumi}{(\alph{enumi})}
-\usepackage{parskip}
+% \usepackage{parskip}
 
 \usepackage{tikz}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{cuted}
+\setlength\stripsep{3pt plus 1pt minus 1pt}
+
+\usepackage{listings}
+\lstset{
+basicstyle=\ttfamily\footnotesize, 
+columns=fullflexible, % make sure to use fixed-width font, CM typewriter is NOT fixed width
+numbers=left, 
+numberstyle=\ttfamily,
+stepnumber=1,              
+numbersep=-2pt, 
+numberfirstline=true, 
+numberblanklines=true, 
+tabsize=4,
+lineskip=-1.5pt,
+extendedchars=true,
+breaklines=true,        
+keywordstyle=\color{Blue}\bfseries,
+identifierstyle=, % using emph or index keywords
+commentstyle=\sffamily\color{OliveGreen},
+stringstyle=\color{Maroon},
+showstringspaces=false,
+showtabs=false,
+upquote=false,
+texcl=true % interpet comments as LaTeX
+}
+
+
+
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+  language         = Julia,
+  basicstyle       = \ttfamily\small,
+  keywordstyle     = \bfseries\color{blue},
+  stringstyle      = \color{magenta},
+  commentstyle     = \color{ForestGreen},
+  showstringspaces = false,
+}
