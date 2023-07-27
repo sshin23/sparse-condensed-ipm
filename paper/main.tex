@@ -26,7 +26,7 @@ relaxation strategy. This technique involves relaxing equality
 constraints to inequalities and condensing the Karush-Kuhn-Tucker
 system into a much smaller positive definite matrix. This strategy
 offers the key advantage of being able to factorize the KKT matrix
-without numerical pivoting, which has hampered the parallelization of
+without numerical pivoting, which in the past has hampered the parallelization of
 the algorithm.  By combining these two strategies, we can perform the
 majority of operations on GPUs while keeping the data residing in the
 device memory only. Comprehensive numerical benchmark results showcase
@@ -131,7 +131,7 @@ patterns does not increase with the network's size. Numerical results
 reported in this paper demonstrate that our proposed strategies can
 achieve over 20 times speedup by running on GPU. In comparison to
 general AD implementations on CPUs (such as AMPL and JuMP.jl), our
-GPU-based method can be approximately 50 times faster.
+GPU-based  differentiation method can be approximately 50 times faster.
 
 Linear algebra operations, especially sparse indefinite matrix
 factorization, are typically the bottleneck in NLP solution methods.
@@ -152,7 +152,7 @@ entries in the KKT system. However, when implemented on GPUs, it
 offers the key advantage of ensuring positive definiteness in the
 condensed KKT system. This, in turn, allows for the utilization
 of linear solvers with a fixed numerical pivot sequence (known as
-refactorization), and an efficient implementation is available in the CUDA library.
+refactorization), an efficient implementation of which is available in the CUDA library.
 Although this method is susceptible to numerical stability issues due to
 increased condition number in the KKT system, our results demonstrate
 that the solver is robust enough to solve problems with a relative
@@ -172,8 +172,8 @@ notable 4x speedup compared to our solver running on CPU, in the case
 of the largest instance. Moreover for the same instance, our approach
 surpasses the performance of existing tools (such as Ipopt interfaced
 with JuMP.jl) by an order of magnitude.  This finding underscores the
-importance of harnessing the computational power of GPUs for tackling
-the computatoinal challenges in power systems.
+importance of harnessing the power of GPUs for tackling
+the computational challenges in power systems.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
