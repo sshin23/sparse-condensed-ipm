@@ -234,7 +234,7 @@ Numerous solution algorithms have been developed in the NLP
 literature. In terms of strategies to deal with inequality
 constraints, the NLP solution algorithms can be broadly classified
 into active-set methods and IPMs \cite{nocedal2006numerical}.
-Active-setmethods aim to find the set of active consraints associated
+Active-set methods aim to find the set of active constraints associated
 with the optimal solution in a combinatorial manner, while IPMs
 replace inequality constraints with smooth barrier functions, enabling
 the use of Newton-type second-order algorithms. IPMs are known to be
@@ -391,13 +391,13 @@ $\chi:\mathbb{R}^{n_x}\times \mathbb{R}^{n_{s}}\rightarrow
 \mathbb{R}^{n_x}$ are simple instructions that require only a small number
 of operations; $\mathop{\rm{Op}}$ is a monoid operator on
 $\mathbb{R}\cup\{+\infty,-\infty\}$, such as addition, multiplication,
-maximum, and minimum; and the notation $\chi_{s_k}(x):=\chi(x,s_k)$ is used, and
-assume that $\circ$ is commutative on $\{\chi_{s_k}(\cdot)\}_{\forall
+maximum, and minimum. In \ref{eqn:pattern-3}, we denote $\chi_{s_k}(x):=\chi(x,s_k)$ and
+assume that $\circ$ is commutative for $\{\chi_{s_k}(\cdot)\}_{\forall
 s_k}$. \ref{eqn:pattern-1} is typically most effective on GPUs, where
 each thread employed can operate independently without needing to
 simultaneously manipulate the same device memory location. While
-\ref{eqn:pattern-2} and \ref{eqn:pattern-3} is less effective as they
-require such a manipulation, but they still can be significantly
+\ref{eqn:pattern-2} and \ref{eqn:pattern-3} are less effective as they
+require such manipulations, they still can be significantly
 faster than operations in CPUs, as substantial part of the operation
 can still be parallelized by the use of buffers. In simple cases, the
 implementation of these operations can be performed with the standard
@@ -424,7 +424,7 @@ high-level interfaces for array and kernel programming for GPU
 arrays. The code can even be device-agnostic, thanks to the portable
 programming capabilities brought by KernelAbstractions.jl. All
 of the AD and optimization capabilities in our
-tools, MadNLP.jl and SIMDiff.jl, are implemented in Julia Language,
+tools, MadNLP.jl and SIMDiff.jl, are implemented in the Julia Language,
 by leveraging its kernel and array programming capabilities.
 
 \begin{figure}[t]
@@ -489,12 +489,12 @@ The SIMD abstraction under consideration is as follows:
   \end{align}
 where $f^{(\ell)}(\cdot,\cdot)$, $g^{(m)}(\cdot,\cdot)$, and
 $h^{(n)}(\cdot,\cdot)$ are twice differentiable functions with respect
-to the first argument, $\{\{p^{(k)}_i\}_{i\in [N_k]}\}_{k\in[K]}$,
+to the first argument, whereas $\{\{p^{(k)}_i\}_{i\in [N_k]}\}_{k\in[K]}$,
 $\{\{q^{(k)}_{i}\}_{i\in [M_l]}\}_{m\in[M]}$, and
 $\{\{\{s^{(n)}_{k}\}_{k\in[K_n]}\}_{n\in[N_m]}\}_{m\in[M]}$ are
 problem data, which can either be discrete or continuous.  We assume
 that our functions $f^{(l)}(\cdot,\cdot)$, $g^{(m)}(\cdot,\cdot)$, and
-$h^{(n)}(\cdot,\cdot)$ can be expressed in the form of computational
+$h^{(n)}(\cdot,\cdot)$ can be expressed with computational
 graphs of moderate length. One can observe that the problem in
 \eqref{eqn:prob} is expressed by the computational patterns in Section
 \ref{sec:gpu}. In particular, the objective function falls within \ref{eqn:pattern-1},
@@ -513,7 +513,7 @@ facilitates the model evaluation and differentiation on GPU
 accelerators.
 
 \subsection{Parallel AD}
-Many of the physics-based models, such as AC OPF, have highly repetitive
+Many of the physics-based models, such as AC OPF, have a highly repetitive
 structure. One of the manifestations of it is that the mathematical
 statement of the model is concise, even if the practical model may contain
 millions of variables and constraints. This is possible due to the use of
@@ -556,10 +556,10 @@ save the computational cost spent for sparsity analysis.  This is
 accomplished by applying sparsity analysis for the instruction for
 each computational pattern and expand the obtained sparsity pattern
 over the data over which the instruction is executed. Specifically,
-the sparisty analysis code exploits Julia's multiple dispatch feature
-to obtain parameterized sparsity pattern for each instruction, and the
+the sparsity analysis code exploits Julia's multiple dispatch feature
+to obtain a parameterized sparsity pattern for each instruction, and the
 obtained parameterized sparsity pattern is materialized once the data
-array is given. This process drastically save the computational cost
+array is given. This process drastically saves in computational cost
 for the sparsity analysis.
 
 \section{Condensed-Space IPMs with an Inequality Relaxation Strategy}\label{sec:ipm}
