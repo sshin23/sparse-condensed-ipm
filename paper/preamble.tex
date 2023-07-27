@@ -1,4 +1,34 @@
-\documentclass{IEEEtran4PSCC}
+% \documentclass{IEEEtran4PSCC} % will be used for submission
+% \author{
+%   \IEEEauthorblockN{Sungho Shin and Mihai Anitescu}
+%   \IEEEauthorblockA{
+%     Mathematics and Computer Science Division\\
+%     Argonne National Laboratory\\
+%     Lemont, IL, USA\\
+%     sshin@anl.gov, anitescu@mcs.anl.gov}
+%   \and
+%   \IEEEauthorblockN{François Pacaud}
+%   \IEEEauthorblockA{Centre Automatique et Systèmes\\
+%     Mines Paris - PSL \\
+%     Paris, France\\
+%     francois.pacaud@minesparis.psl.eu}
+% }
+% \psccfooter{%
+%         \parbox{\textwidth}{\hrulefill \\ \small{23rd Power Systems Computation Conference} \hfill \begin{minipage}{0.2\textwidth}\centering \vspace*{4pt} \includegraphics[scale=0.06]{PSCC_logo.png}\\\small{PSCC 2024} \end{minipage} \hfill \small{Paris, France --- June 4 -- 7, 2024}}%
+% }
+
+\documentclass{IEEEtran} % for ArXiv submission
+\author{
+  Sungho Shin, François Pacaud, and Mihai Anitescu
+  \thanks{
+    Sungho Shin and Mihai Anitescu are with Mathematics and Computer Science Division,  Argonne National Laboratory, Lemont, IL, USA. e-mail: \url{sshin@anl.gov}, \url{anitescu@mc.anl.gov}
+  }
+  \thanks{
+    François Pacaud is with Centre Automatique et Systèmes, Mines Paris - PSL, Paris, France. e-mail: \url{francois.pacaud@minesparis.psl.eu}
+  }
+}
+
+
 
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -21,9 +51,6 @@
 }
 \makeatother
 
-\psccfooter{%
-        \parbox{\textwidth}{\hrulefill \\ \small{23rd Power Systems Computation Conference} \hfill \begin{minipage}{0.2\textwidth}\centering \vspace*{4pt} \includegraphics[scale=0.06]{PSCC_logo.png}\\\small{PSCC 2024} \end{minipage} \hfill \small{Paris, France --- June 4 -- 7, 2024}}%
-}
 
 \usepackage{amsmath,amssymb,amsthm,amsfonts} % assumes amsmath package installed
 \usepackage[linktocpage=true,colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
@@ -184,3 +211,5 @@ texcl=true % interpet comments as LaTeX
   commentstyle     = \color{ForestGreen},
   showstringspaces = false,
 }
+
+\usepackage{cite}
