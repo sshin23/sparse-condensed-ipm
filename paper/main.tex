@@ -699,7 +699,7 @@ the lower-right 4x4 block, resulting in:
       & \Sigma_s + \delta_w I & -I\\
       A& -I & -\delta_c I\\
     \end{bmatrix}
-  }_{M_{\text{red}}}
+  }_{M_{\text{aug}}}
   \begin{bmatrix}
     \Delta x \\
     \Delta s \\
@@ -730,14 +730,14 @@ The bound dual steps can be recovered as follows:
 \end{align}
 Note that the matrices involved in the inversions in \eqref{eqn:recover-1}
 are always diagonal, so their computation is cheap.
-Also, note that the reduced system in \eqref{eqn:very-long-reduced}
+Also, note that the augmented system in \eqref{eqn:very-long-reduced}
 corresponds to the KKT system in \eqref{eqn:kkt-indefinite}. However,
 in the original version of the algorithm, we did not introduce the
 slack variables, so it does not have the additional structure imposed
 by the slack variables.
 
 The key advantage of the inequality relaxation strategy is that it
-imposes additional structure to the reduced KKT system, allowing us to
+imposes additional structure to the augmented KKT system, allowing us to
 further reduce the dimension of the problem. In particular, the
 lower-right 2x2 block in \eqref{eqn:very-long-reduced} can be
 eliminated, which is a procedure called {\it condensation}; here, the invertibility of the lower-right block can be verified from the fact that $\delta_w,\delta_c\geq 0$ and $\Sigma_s\succ 0$. Through this,
@@ -774,14 +774,14 @@ GPUs is that the matrix in \eqref{eqn:very-long-condensed} is positive
 definite upon the application of standard inertia correction
 method. Typically, to guarantee that the computed step direction is a
 descent direction, we need a condition that
-$\text{inertia}(M_\text{red}) = (n+5m,0,m)$. Here, inertia refers to
+$\text{inertia}(M_\text{aug}) = (n+5m,0,m)$. Here, inertia refers to
 the tuple of positive, zero, and negative eigenvalues. Accordingly, we
 employ inertia correction methods to modify the augmented KKT system
 so that the desired conditions on the inertia is satisfied.
 
 By Sylvester's law, we have:
 \begin{align*}
-  &\text{inertia}(M_\text{red}) = (n+5m,0,m)\\
+  &\text{inertia}(M_\text{aug}) = (n+5m,0,m)\\
   &\iff \text{inertia}(M_\text{cond}) = (n,0,0).
 \end{align*}
 Thus, any choice of $\delta_w,\delta_c>0$ that makes the condensed KKT
@@ -1085,7 +1085,7 @@ strategy, similarly to \cite{pacaud2023parallel}, to demonstrate even
 greater scalability.
 
 \paragraph*{Alternative Linear Solvers}
-While cuSOLVERRF has been effective for solving the condensed KKT
+While {\tt cuSOLVERRF} has been effective for solving the condensed KKT
 systems using LU factorization, Cholesky factorization holds promise
 for better performance due to lower computational complexity and the
 ability to reveal the inertia of the KKT system. In the future, we are
