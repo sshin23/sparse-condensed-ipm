@@ -133,7 +133,8 @@ number of computational patterns does not increase with the network's
 size. Numerical results reported in this paper demonstrate that our
 proposed strategies can achieve over 20 times speedup by running on
 GPU. In comparison to general AD implementations on CPUs (such as AMPL
-and JuMP.jl), our GPU-based  differentiation method can be approximately 50 times faster.
+and JuMP.jl), our GPU-based differentiation method can be
+approximately 500 times faster.
 
 Linear algebra operations, especially sparse indefinite matrix
 factorization, are typically the bottleneck in NLP solution methods.
@@ -182,13 +183,11 @@ We present, for the first time, a nonlinear optimization framework
 that can run entirely on GPU, with all the performance-critical data
 arrays residing exclusively on GPUs. Additionally, we introduce the
 concept of SIMD abstraction for NLP problems, which results in an
-efficient implementation of GPU-accelerated parallel AD, leading to a
-50x speedup compared to existing tools for large-scale
-OPFs. Furthermore, we propose the condensed IPM with inequality
-relaxation strategy for the first time, enabling the treatment of the
-KKT systems of NLPs without numerical pivoting, thus allowing the
-solution of sparse, large-scale NLPs (with a prominent example being
-AC OPFs) on GPUs.
+efficient implementation of GPU-accelerated parallel AD. Furthermore,
+we propose the condensed IPM with inequality relaxation strategy for
+the first time, enabling the treatment of the KKT systems of NLPs
+without numerical pivoting, thus allowing the solution of sparse,
+large-scale NLPs (with a prominentexample being AC OPFs) on GPUs.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
@@ -623,7 +622,7 @@ due to the increased condition number of the KKT system.
 We have found that setting $\epsilon_{\text{tol}}$ to be
 $\epsilon_{\text{mach}}^{1/4}\approx 10^{-4}$ ensures numerical
 stability while achieving satisfactory convergence behavior. Thus, our
-solver sets the tolerance to $10^{-4}$ by default when using condensed
+solver sets the $\epsilon_\text{tol}$ to $10^{-4}$ by default when using condensed
 IPM.
 
 \subsection{Barrier Subproblem}
@@ -655,8 +654,8 @@ The Newton step direction is computed by solving a so-called KKT system; to expl
   \begin{aligned}[t]
     \nabla_{x} f(x) - \nabla_{x}g(x)^\top y  - z_x^\flat  + z_x^\sharp = 0\;&\\
     \begin{aligned}
-      - z_s^\flat  + z_s^\sharp  &= 0\\
-      Z^\flat_x (x-x^\flat) - \mu\boldsymbol{1} &= 0\\
+      - z_s^\flat  + z_s^\sharp + y &= 0,\\
+      Z^\flat_x (x-x^\flat) - \mu\boldsymbol{1} &= 0,\\
       Z^\flat_s (s-s^\flat) - \mu\boldsymbol{1}&= 0,
     \end{aligned}
     \quad
@@ -671,11 +670,11 @@ where $y\in\mathbb{R}^{m}$, $z_x^\flat,z_x^\sharp\in\mathbb{R}^{n}$,
 and $z_s^\flat,z_s^\sharp\in\mathbb{R}^{m}$ are Lagrange multipliers
 associated with the equality and bound constraints in
 \eqref{eqn:relaxed}. The Newton step for solving the nonlinear
-equations in \eqref{eqn:first} can be computed by solving the unreduced KKT system in \eqref{eqn:very-long-eqn}.
-\begin{figure*}[h!]
+equations in \eqref{eqn:first} can be computed by solving the system in Fig. \ref{fig:very-long-eqn}.
+\begin{figure*}[t]
   % \begin{strip}
   % \hline
-  \begin{align}\label{eqn:very-long-eqn}
+  \begin{align*}
     \underbrace{
     \begin{bmatrix}
       W^{(\ell)}  + \delta^{(\ell)}_w I & & A^{(\ell)\top}& -I & I &  \\
@@ -705,17 +704,16 @@ equations in \eqref{eqn:first} can be computed by solving the unreduced KKT syst
       p^{(\ell)}_{z_s^\flat }\\
       p^{(\ell)}_{z_s^\sharp }\\
     \end{bmatrix}
-  \end{align}
-% \hline
-% \end{strip}
+  \end{align*}
+  \caption{Full KKT system}\label{fig:very-long-eqn} 
 \end{figure*}
 Here, we recall the definitions of $W^{(\ell)}$ and $A^{(\ell)}$ from Section \ref{sec:numopt}, and
 $p^{(\ell)}_x,\cdots p^{(\ell)}_{z_s^\sharp}$ are defined by the left-hand-sides of the equations in
 \eqref{eqn:first}. In sequel, we shall drop the superscript
 $(\cdot)^{(\ell)}$ for concise notation.
 
-Now, we observe that a significant portion of the system in
-\eqref{eqn:very-long-eqn} can be eliminated by exploiting the block
+Now, we observe that a significant portion of the system in Fig.
+\eqref{fig:very-long-eqn} can be eliminated by exploiting the block
 structure, leading to an equivalent system stated in a smaller
 space. In particular, the lower-right $4\times 4$ block is always
 invertible since the IPM procedure ensures that the iterates stay in
@@ -741,7 +739,7 @@ the lower-right 4x4 block, resulting in:
     q_y\\
   \end{bmatrix},
 \end{align}
-where the dependence on the evaluation point is suppressed for concise notation, and:
+where:
 \begin{align*}
   \Sigma_x&:= Z^\flat_x (X-X^\flat)^{-1}+ Z^\sharp_x (X^\sharp-X)^{-1}\\
   \Sigma_s&:= Z^\flat_s (S-S^\flat)^{-1}+ Z^\sharp_s (S^\sharp-S)^{-1}\\
@@ -767,7 +765,7 @@ slack variables, so it does not have the additional structure imposed
 by the slack variables.
 
 The key advantage of the inequality relaxation strategy is that it
-imposes additional structure to the reduced KKT system, allowing us to
+imposes additional structure to the augmented KKT system, allowing us to
 further reduce the dimension of the problem. In particular, the
 lower-right 2x2 block in \eqref{eqn:very-long-reduced} can be
 eliminated, which is a procedure called {\it condensation}; here, the invertibility of the lower-right block can be verified from the fact that $\delta_w,\delta_c\geq 0$ and $\Sigma_s\succ 0$. Through this,
@@ -791,13 +789,15 @@ diagonal, so their computation is cheap.
 
 Therefore, the only sparse matrix that needs to be factorized is the
 matrix in the left-hand-side of \eqref{eqn:very-long-condensed}, with
-dimension $n \times n$.
-In general NLPs, the condensation strategy
-can arbitrarily increase the density of the KKT system, but for AC OPF
-problems, the condensed KKT system remains sparse.
-This is because the maximum number of nonzeros per row in constraint
-Jacobian is bounded by the graph degree, which should be reasonably
-small in practice.
+dimension $n \times n$.  Although we call
+\eqref{eqn:very-long-condensed} a condensed KKT system,
+$M_\text{cond}$ is not necessarily a dense matrix. In fact, in the
+case of AC OPF problems, $M_\text{cond}$ is still highly sparse, as
+$W$ and $A$ are graph-induced banded systems.  Thus, exploiting
+sparsity is still necessary to enable scalable computations.  In
+general NLPs, however, the condensation strategy can arbitrarily
+increase the density of the KKT system. Thus, the condensed-space IPM
+strategy needs to be used with caution.
 
 The reason that the condensation strategy is particularly relevant for
 GPUs is that the matrix in \eqref{eqn:very-long-condensed} is positive
@@ -823,12 +823,6 @@ Cholesky factorization or LU refactorization), which is significantly
 more amenable to parallel implementation than indefinite LBL$^\top$
 factorization (standard in the state-of-the-art IPM
 algorithms but requires the use of pivoting).
-
-Although we call \eqref{eqn:very-long-condensed} a condensed KKT system,
-$M_\text{cond}$ is not necessarily a dense matrix. In fact, in the case of
-AC OPF problems, $M_\text{cond}$ is still highly sparse, as $W$
-and $A$ are graph-induced banded systems. Thus, exploiting sparsity is
-still necessary to enable scalable computations.
 
 As we approach towards the solution, multiple constraints become active:
 in the diagonal matrices $\Sigma_x$ and $\Sigma_s$, the terms associated
@@ -966,7 +960,7 @@ breakdown into linear algebra and derivative evaluation time (with the
 remainder considered as solver internal time), are shown in Table
 \ref{tbl:results}. The quality of the solution (objective value and
 constraint violation measured by $\|\cdot\|_\infty$) is shown in Table
-\ref{tbl:quality}. Figure \ref{fig:speedup} visually represents the
+\ref{tbl:quality}. Fig. \ref{fig:speedup} visually represents the
 speedup brought by GPUs, by comparing the timing results of
 \ref{config-1} and \ref{config-2}.
 
@@ -1016,7 +1010,7 @@ speedup brought by GPUs, by comparing the timing results of
   \label{fig:speedup}
 \end{figure}
 
-\paragraph{Convergence pattern}
+\paragraph*{Convergence pattern}
 First, when comparing the solvers' performance in terms of the
 interior point method (IPM) iteration counts, MadNLP.jl is as
 efficient as the state-of-the-art solver Ipopt. The IPM iteration
@@ -1026,22 +1020,19 @@ suggests that running mathematically equivalent operations on GPUs (by
 using shared code base in high-level abstractions) can yield a similar
 degree of effectiveness in terms of IPM convergence.
 
-\paragraph{Performance of SIMD AD}
+\paragraph*{Performance of AD}
 Next, we discuss the effectiveness of parallel AD on GPUs. We observe
 that even on CPUs, SIMDiff.jl is substantially faster than the AD
-routines implemented in AMPL or JuMP.jl. Indeed,
-SIMDiff.jl generates derivative functions specifically compiled
-for the type of model, including optimization for the distinctive
-computational pattern found in the model. When comparing SIMDiff.jl running
-on CPUs and GPUs, we observe a further speedup on the GPU of up to almost 20x for
-large instances (e.g., case24465\_goc); remarkably, this is 50 times
-faster than JuMP.jl. This demonstrates that parallelizing AD
-brings significant computational gain.
-This is because most operations in the derivative
-evaluations are \ref{eqn:pattern-1}
-operations, highly effective on GPUs.
+routines implemented in AMPL or JuMP.jl. Indeed, SIMDiff.jl generates
+derivative functions specifically compiled for the type of model,
+including optimization for the distinctive computational pattern found
+in the model. When comparing SIMDiff.jl running on CPUs and GPUs, we
+observe a further speedup on the GPU of up to almost 20x for large
+instances (e.g., case24465\_goc); remarkably, this is 500 times faster
+than JuMP.jl. This demonstrates that adopting SIMD abstraction and
+parallelizing AD brings significant computational gain. 
 
-\paragraph{Performance of the condensed KKT strategy}
+\paragraph*{Performance of the Condensed-Space IPM}
 We next discuss the linear solver time. While the speedup achieved by
 linear solvers is only moderate, this has a high impact on the overall
 speedup, as linear solver time constitutes a significant portion of
@@ -1054,9 +1045,9 @@ more effective warrants further research.
 Solver internal time could also be significantly accelerated through
 GPU utilization. We can observe that the speedup in solver internal
 operations is consistently greater than the speedup in linear
-solvers. However, due to the frequent use of \ref{eqn:pattern-2}
-operations, the speedup in solver internal operations is lesser than
-that of derivative evaluations.
+solvers. However, due to the frequent use of \ref{eqn:pattern-2} and
+\ref{eqn:pattern-3} operations, the speedup in solver internal
+operations is lesser than that of derivative evaluations.
 
 Overall, our GPU implementation exhibits significant speedup across
 all components (derivative evaluation, linear algebra, and solver
@@ -1069,9 +1060,22 @@ implementation and approximately 10 times faster than
 state-of-the-art tools (Ipopt, JuMP.jl, and Ma27).
 This demonstrates that GPUs can bring significant computational
 gains for large-scale AC OPF problems, enabling the solution of
-previously inconceivable problems due to the limitations of existing
-CPU-based solution tools.
+previously inconceivable problems due to the limitations of CPU-based
+solution tools.
 
+\paragraph*{Known Limiataions}
+The key limitation of our method is the decreased precision of the
+final solution. Reliable convergence is achieved only up to a
+tolerance of $10^{-4}$. We have observed that the condensation of the
+KKT system worsens the conditioning of the already ill-conditioned
+augmented KKT system, resulting in even higher condition numbers,
+particularly when the solution is almost converged. For instance, in
+the case of case118\_ieee, the condition number of the KKT system at
+the solution (with tolerance set to $10^{-4}$) is $9.43\times 10^{11}$
+for the augmented KKT system and $3.15\times 10^{14}$ for the
+condensed KKT system. As a consequence, the achievable precision of
+the solution is reduced. Further investigation into the possibility of
+obtaining higher precision will be necessary in the future.
 
 \section{Conclusions and Future Outlook}\label{sec:conc}
 We have presented an NLP solution framework for solving large-scale AC
