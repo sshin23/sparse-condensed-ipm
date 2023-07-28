@@ -744,7 +744,7 @@ where:
   \Sigma_x&:= Z^\flat_x (X-X^\flat)^{-1}+ Z^\sharp_x (X^\sharp-X)^{-1}\\
   \Sigma_s&:= Z^\flat_s (S-S^\flat)^{-1}+ Z^\sharp_s (S^\sharp-S)^{-1}\\
   q_x&:=p_x + (X-X^\flat)^{-1} p_{z^\flat_x}-  (X^\sharp-X)^{-1} p_{z^\sharp_x}\\
-  q_s&:= (S-S^\flat)^{-1} p_{z^\flat_s}-  (S^\sharp-S)^{-1} p_{z^\sharp_s}\\
+  q_s&:=p_s + (S-S^\flat)^{-1} p_{z^\flat_s}-  (S^\sharp-S)^{-1} p_{z^\sharp_s}\\
   q_y&:=p_y.
 \end{align*}
 The bound dual steps can be recovered as follows:
@@ -772,7 +772,7 @@ eliminated, which is a procedure called {\it condensation}; here, the invertibil
 we obtain the following system, written in the  primal
 space only:
 \begin{align}\label{eqn:very-long-condensed}
-  (\underbrace{W + \delta_wI + \Sigma_x + A^{\top} D A}_{M_\text{cond}} ) \Delta x = q_x + A^\top (C q_y +  Dq_s ),
+  (\underbrace{W + \delta_wI + \Sigma_x + A^{\top} D A}_{M_\text{cond}} ) \Delta x = q_x + A^\top (C q_s +  Dq_y ),
 \end{align}
 where:
 \begin{align*}
