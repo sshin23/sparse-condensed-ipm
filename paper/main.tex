@@ -15,7 +15,7 @@ alternating current optimal power flow (ACOPF) problems using
 graphics processing units (GPUs). While GPUs have demonstrated
 remarkable performance in various computing domains, their application
 in AC OPF has been limited due to challenges associated with porting
-sparse automatic differentiation (AD) and sparse linear solver
+sparse automatic differentiation (AD) and spars e linear solver
 routines to GPUs. We aim to address these issues with two key
 strategies. First, we utilize a single-instruction, multiple-data
 (SIMD) abstraction of nonlinear programs (NLP). This approach enables
@@ -732,8 +732,8 @@ Note that the matrices involved in the inversions in \eqref{eqn:recover-1}
 are always diagonal, so their computation is cheap.
 Also, note that the augmented system in \eqref{eqn:very-long-reduced}
 corresponds to the KKT system in \eqref{eqn:kkt-indefinite}. However,
-in the original version of the algorithm, we did not introduce the
-slack variables, so it does not have the additional structure imposed
+in the original version of the algorithm \cite{pacaud2023accelerating}, we did not introduce the
+slack variables, so it did not have the additional structure imposed
 by the slack variables.
 
 The key advantage of the inequality relaxation strategy is that it
@@ -867,7 +867,7 @@ condensed-space IPM in Algorithm \ref{alg:con-ipm}.
 We have implemented the condensed-space IPM by adapting our code base
 in MadNLP.jl, a port of Ipopt in Julia.
 A key feature of MadNLP is that the IPM is implemented with a
-high levels of abstraction, while the specific handling of the data
+high level of abstraction, while the specific handling of the data
 structures within the KKT systems is carried out by data-type specific
 kernel functions. This design allows us to apply the mathematical
 operations equivalent to Ipopt to different KKT data structures, such as
