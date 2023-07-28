@@ -15,7 +15,7 @@ alternating current optimal power flow (ACOPF) problems using
 graphics processing units (GPUs). While GPUs have demonstrated
 remarkable performance in various computing domains, their application
 in AC OPF has been limited due to challenges associated with porting
-sparse automatic differentiation (AD) and spars e linear solver
+sparse automatic differentiation (AD) and sparse linear solver
 routines to GPUs. We aim to address these issues with two key
 strategies. First, we utilize a single-instruction, multiple-data
 (SIMD) abstraction of nonlinear programs (NLP). This approach enables
@@ -39,7 +39,8 @@ tools running on contemporary CPUs.
 \end{abstract}
 
 \begin{IEEEkeywords}
-  nonlinear programming, automatic differentiation, GPU computing, optimal power flow
+  nonlinear programming, automatic differentiation, GPU computing,
+optimal power flow
 \end{IEEEkeywords}
 \section{Introduction}
 
@@ -104,8 +105,8 @@ majority of operations executed on the GPU.
   \caption{A schematic description of host (CPU) and device (GPU) memory.}\label{fig:memory}
 \end{figure}
 
-This paper presents our approach to implement a comprehensive
-computational framework for solving large-scale AC OPF problems on
+This paper presents our approach to implementing a comprehensive
+a computational framework for solving large-scale AC OPF problems on
 NVIDIA GPUs, along with the associated software implementations:
 SIMDiff.jl \cite{simdiff}, an algebraic modeling/AD tool, and MadNLP.jl \cite{madnlp}, an
 NLP solver. Our approach incorporates two novel strategies: (i) a
@@ -129,7 +130,7 @@ within the model equations, facilitating efficient derivative
 evaluations on the GPU. The AC power flow model is particularly
 well-suited for this abstraction as it involves repetitive expressions
 for each component type (e.g., buses, lines, generators), and the
-number of computational patterns does not increase with the network's
+the number of computational patterns does not increase with the network's
 size. Numerical results reported in this paper demonstrate that our
 proposed strategies can achieve over 20 times speedup by running on
 GPU. In comparison to general AD implementations on CPUs (such as AMPL
@@ -164,7 +165,7 @@ accuracy of $\epsilon_{\text{mach}}^{1/4}\approx 10^{-4}$.
 We present numerical benchmark results to showcase the efficiency of
 our method, utilizing our two packages: MadNLP.jl and
 SIMDiff.jl. The solution of the KKT system is performed using the
-external {\tt cuSOLVER} library. To assess the performance of our method, we
+external cuSOLVER library. To assess the performance of our method, we
 compare it against standard CPU approaches using the data available in
 pglib-opf \cite{babaeinejadsarookolaee2019power}.  Our benchmark results
 demonstrate that our proposed computational framework has significant
@@ -172,7 +173,7 @@ potential for accelerating the solution of AC OPF problems, especially
 when a moderate accuracy (e.g., $10^{-4}$) is sufficient.
 Notably, when running on NVIDIA GPUs, our method achieves a
 4x speedup compared to our solver running on CPU for
-the largest instance. Moreover for the same instance, our approach
+the largest instance. Moreover, for the same instance, our approach
 surpasses the performance of existing tools (such as Ipopt interfaced
 with JuMP.jl) by an order of magnitude. This finding underscores the
 importance of harnessing the power of GPUs for tackling
@@ -184,10 +185,10 @@ that can run entirely on GPU, with all the performance-critical data
 arrays residing exclusively on GPUs. Additionally, we introduce the
 concept of SIMD abstraction for NLP problems, which results in an
 efficient implementation of GPU-accelerated parallel AD. Furthermore,
-we propose the condensed IPM with inequality relaxation strategy for
+we propose the condensed IPM with an inequality relaxation strategy for
 the first time, enabling the treatment of the KKT systems of NLPs
 without numerical pivoting, thus allowing the solution of sparse,
-large-scale NLPs (with a prominentexample being AC OPFs) on GPUs.
+large-scale NLPs (with a prominent example being AC OPFs) on GPUs.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
@@ -249,7 +250,8 @@ convention $X:=\diag(x)$ for any symbol $x$.
 This section covers three essential background topics: numerical
 optimization, AD, and GPU computing.
 
-\subsection{Numerical Optimization}\label{sec:numopt}
+This section covers three essential background topics: numerical
+optimization, AD, and GPU computing.\subsection{Numerical Optimization}\label{sec:numopt}
 We consider NLPs of the following form:
 \begin{equation}\label{eqn:cpt}
     \min_{x^\flat \leq x \leq x^\sharp}\;  f(x) \quad \st\;
@@ -332,7 +334,7 @@ determined based on the inertia correction procedure.
 3) The optimization solver employs a filter line search procedure to
 determine the step size~\cite{wachter2006implementation}. The primal-dual iterate is updated by
 applying the determined step size and direction. This process is
-repeated until satisfaction of the convergence criteria (typically based on the residual
+repeated until the satisfaction of the convergence criteria (typically based on the residual
 to the first-order optimality conditions).
 
 \subsection{Automatic Differentiation (AD)}
@@ -388,7 +390,7 @@ while preserving the desired sparsity.
 With the increasing prevalence of GPU in various scientific computing
 domains, there has been growing interest in leveraging these emerging
 architectures to efficiently solve large-scale NLPs, like AC OPF problems.
-However, adapting a NLP solution algorithms,
+However, adapting an NLP solution algorithm,
 such as IPM, to GPUs presents challenges due to the fundamental
 differences between GPU and CPU programming paradigms. While CPUs
 execute a sequence of instructions on a single input (single
@@ -401,7 +403,7 @@ paradigm. For example, branching in the control flow can hinder
 lockstep execution across multiple threads, and in turn, prevent
 efficient implementations on GPUs. On the contrary, when the
 algorithm's structure allows for efficient parallelization, the SIMD
-parallelism in GPUs can offer orders of magnitudes speedup.
+parallelism in GPUs can offer orders of magnitude speedup.
 
 We highlight that the following, arguably common, computational
 patterns are particularly effective when implemented on GPUs:
@@ -504,6 +506,7 @@ This section describes our implementation of SIMD abstraction and
 sparse AD of the model equations. The abstraction and AD are
 implemented as part of our algebraic modeling language SIMDiff.jl.
 
+
 \subsection{Abstraction}
 The SIMD abstraction under consideration is as follows:
 \begin{align}\label{eqn:prob}
@@ -563,11 +566,10 @@ structure can be directly available in AD implementation.
 
 Using the multiple dispatch feature of Julia, SIMDiff.jl generates
 highly efficient derivative computation code, specifically compiled
-for each computational pattern in the model. These derivative
-evaluation code can be run over the data in various GPU array formats,
-implemented via array and kernel programming in Julia Language. In
+for each computational pattern in the model. These derivative evaluation codes can be run over the data in various GPU array formats,
+and implemented via array and kernel programming in Julia Language. In
 turn, SIMDiff.jl has the capability to efficiently evaluate first and
-second order derivatives using GPU accelerators.
+second-order derivatives using GPU accelerators.
 
 \subsection{Sparsity Analysis}
 The sparsity analysis is needed for determining the sparsity pattern
@@ -575,19 +577,19 @@ of the evaluated derivatives. In the case of large-scale sparse
 problems, the initial sparsity analysis of nonlinear expressions can
 be expensive, as the sparsity should be analyzed for potentially
 millions of objective and constraints terms. However, oftentimes
-these analyses are applied for the same computational patterns, and
-the time and memory spent for sparsity analysis can be significantly
+these analyses are applied to the same computational patterns, and
+the time and memory spent on sparsity analysis can be significantly
 reduced if the repetitive structures are exploited.
 
 SIMDiff.jl exploits the SIMD abstraction of the model equations to
 save the computational cost spent for sparsity analysis.  This is
 accomplished by applying sparsity analysis for the instruction for
-each computational pattern and expand the obtained sparsity pattern
+each computational pattern and expanding the obtained sparsity pattern
 over the data over which the instruction is executed. Specifically,
 the sparsity analysis code exploits Julia's multiple dispatch feature
 to obtain a parameterized sparsity pattern for each instruction, and the
 obtained parameterized sparsity pattern is materialized once the data
-array is given. This process drastically saves in computational cost
+array is given. This process drastically saves computational costs
 for the sparsity analysis.
 
 \section{Condensed-Space IPMs with an Inequality Relaxation Strategy}\label{sec:ipm}
@@ -709,7 +711,7 @@ equations in \eqref{eqn:first} can be computed by solving the system in Fig. \re
 \end{figure*}
 Here, we recall the definitions of $W^{(\ell)}$ and $A^{(\ell)}$ from Section \ref{sec:numopt}, and
 $p^{(\ell)}_x,\cdots p^{(\ell)}_{z_s^\sharp}$ are defined by the left-hand-sides of the equations in
-\eqref{eqn:first}. In sequel, we shall drop the superscript
+\eqref{eqn:first}. In the sequel, we shall drop the superscript
 $(\cdot)^{(\ell)}$ for concise notation.
 
 Now, we observe that a significant portion of the system in Fig.
@@ -807,7 +809,7 @@ descent direction, we need a condition that
 $\text{inertia}(M_\text{aug}) = (n+5m,0,m)$. Here, inertia refers to
 the tuple of positive, zero, and negative eigenvalues. Accordingly, we
 employ inertia correction methods to modify the augmented KKT system
-so that the desired conditions on the inertia is satisfied.
+so that the desired conditions on the inertia are satisfied.
 
 By Sylvester's law, we have:
 \begin{align*}
@@ -824,9 +826,9 @@ more amenable to parallel implementation than indefinite LBL$^\top$
 factorization (standard in the state-of-the-art IPM
 algorithms but requires the use of pivoting).
 
-As we approach towards the solution, multiple constraints become active:
+As we approach the solution, multiple constraints become active:
 in the diagonal matrices $\Sigma_x$ and $\Sigma_s$, the terms associated
-to the active (resp. inactive) variables $(x, s)$ go to infinity
+with the active (resp. inactive) variables $(x, s)$ go to infinity
 (resp. $0$).
 As such, the presence of active constraints can arbitrarily
 increase the conditioning of the KKT system, leading to
@@ -844,8 +846,8 @@ The step size can be determined using the line search procedure.
 Although there are numerous alternative approaches, we follow the
 filter line search method implemented in the Ipopt solver. The line
 search procedure employed here determines the step size by performing
-backtracking line search until a trial point satisfying sufficient
-progress conditions are satisfied and acceptable by the
+a backtracking line search until a trial point satisfying sufficient
+progress conditions is satisfied and acceptable by the
 filter. Furthermore, to enhance the convergence behavior, various
 additional strategies are implemented, such as the second-order
 correction, restoration phase, and automatic scaling. For the details
@@ -896,8 +898,7 @@ structures within the KKT systems is carried out by data-type specific
 kernel functions. This design allows us to apply the mathematical
 operations equivalent to Ipopt to different KKT data structures, such as
 {\tt SparseKKTSystem}, {\tt DenseKKTSystem}, {\tt
-DenseCondensedKKTSystem}, etc, whose data are stored either on host or
-device memory. For the implementation of the condensed-space IPM
+DenseCondensedKKTSystem}, etc, whose data are stored either on the host or device memory. For the implementation of the condensed-space IPM
 presented in this paper, we have added a new type of KKT system called
 {\tt SparseCondensedKKTSystem} and implemented additional kernels
 needed for handling the data structures specific to this KKT system
@@ -936,10 +937,10 @@ systems. In \ref{config-1}, MadNLP.jl applies the condensed-space IPM
 along with the inequality relaxation strategy, while in
 \ref{config-2}, MadNLP.jl applies IPM based on the indefinite,
 non-condensed KKT system, as in \eqref{eqn:kkt-indefinite}. In
-\ref{config-1}, we use the {\tt cuSOLVER} library to solve the condensed KKT
+\ref{config-1}, we use the cuSOLVER library to solve the condensed KKT
 system. The initial symbolic factorization is performed on the CPU using the KLU
 package \cite{davis2010algorithm}, and the subsequent numerical
-factorization and triangular solves are performed by {\tt cuSOLVER} with the
+factorization and triangular solves are performed by cuSOLVER with the
 fixed pivot sequence from KLU.  Software and hardware details of each
 configuration are illustrated in Table \ref{tbl:settings}. The AC OPF
 problem is formulated using the model from the rosetta-opf project
@@ -1039,7 +1040,7 @@ speedup, as linear solver time constitutes a significant portion of
 the total solution time. For large instances, approximately 4x speedup
 can be achieved, though this can vary depending on the instances. For
 example, for case24464\_goc, the GPU linear solver was slower than the
-CPUs. The investigation of under which circumstances {\tt cuSOLVERRF} is
+CPUs. The investigation of under which circumstances cuSOLVER is
 more effective warrants further research.
 
 Solver internal time could also be significantly accelerated through
@@ -1094,7 +1095,7 @@ large-scale optimization area. However, the condensation procedure
 leads to an increase in the condition number of the KKT system,
 resulting in decreased final solution accuracy. Addressing the
 challenges posed by ill-conditioning remains to be an important aspect
-for future work. In the following paragraphs, we discuss some
+of future work. In the following paragraphs, we discuss some
 remaining open questions and future outlooks.
 
 \paragraph*{Obtaining Higher Numerical Precision}
@@ -1120,7 +1121,7 @@ strategy, similarly to \cite{pacaud2023parallel}, to demonstrate even
 greater scalability.
 
 \paragraph*{Alternative Linear Solvers}
-While {\tt cuSOLVERRF} has been effective for solving the condensed KKT
+While cuSOLVER has been effective for solving the condensed KKT
 systems using LU factorization, Cholesky factorization holds promise
 for better performance due to lower computational complexity and the
 ability to reveal the inertia of the KKT system. In the future, we are
@@ -1134,7 +1135,7 @@ GPU implementation is largely based on array programming and
 KernelAbstractions.jl in Julia, which are in principle  compatible with
 various GPU architectures, including AMD, Intel, and Apple GPUs. By
 incorporating cross-architecture linear solvers, we envision
-supporting broader class of GPU accelerators in the future.
+supporting a broader class of GPU accelerators in the future.
 
 
 \bibliographystyle{ieeetr}
