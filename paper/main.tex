@@ -1,4 +1,4 @@
-\input{preamble}
+% \input{preamble}
 \title{Accelerating Optimal Power Flow with GPUs: SIMD Abstraction of Nonlinear Programs and Condensed-Space Interior-Point Methods
 }
 
@@ -104,7 +104,6 @@ majority of operations executed on the GPU.
   \caption{A schematic description of host (CPU) and device (GPU) memory.}\label{fig:memory}
 \end{figure}
 
-\subsection{Contributions}
 This paper presents our approach to implement a comprehensive
 computational framework for solving large-scale AC OPF problems on
 NVIDIA GPUs, along with the associated software implementations:
@@ -117,25 +116,25 @@ relaxation strategy, which facilitates the use of highly efficient
 {\it refactorization} routines for sparse matrix factorization with
 fixed pivot sequences.
 
-\paragraph*{SIMD abstraction of nonlinear programs}
-While derivative evaluation can be generally cheaper than linear
-algebra operations, our numerical results on AC OPF problems
-show that AD often constitutes more than half of the total solver time when using
-off-the-shelf AD implementations like JuMP.jl~\cite{dunning2017jump} or AMPL~\cite{fourer1990modeling}. Instead,
-our method leverages a specialized AD
-implementation based on the SIMD abstraction of NLPs. This abstraction
-allows to preserve the parallelizable structure within the model
-equations, facilitating efficient derivative evaluations on the
-GPU. The AC power flow model is particularly well-suited for this
-abstraction as it involves repetitive expressions for each component
-type (e.g., buses, lines, generators), and the number of computational
-patterns does not increase with the network's size. Numerical results
-reported in this paper demonstrate that our proposed strategies can
-achieve over 20 times speedup by running on GPU. In comparison to
-general AD implementations on CPUs (such as AMPL and JuMP.jl), our
-GPU-based  differentiation method can be approximately 50 times faster.
 
-\paragraph*{Condensed-space interior-point method}
+While derivative evaluation can be generally cheaper than linear
+algebra operations, our numerical results on AC OPF problems show that
+AD often constitutes more than half of the total solver time when
+using off-the-shelf AD implementations like
+JuMP.jl~\cite{dunning2017jump} or
+AMPL~\cite{fourer1990modeling}. Instead, our method leverages a
+specialized AD implementation based on the SIMD abstraction of
+NLPs. This abstraction allows to preserve the parallelizable structure
+within the model equations, facilitating efficient derivative
+evaluations on the GPU. The AC power flow model is particularly
+well-suited for this abstraction as it involves repetitive expressions
+for each component type (e.g., buses, lines, generators), and the
+number of computational patterns does not increase with the network's
+size. Numerical results reported in this paper demonstrate that our
+proposed strategies can achieve over 20 times speedup by running on
+GPU. In comparison to general AD implementations on CPUs (such as AMPL
+and JuMP.jl), our GPU-based  differentiation method can be approximately 50 times faster.
+
 Linear algebra operations, especially sparse indefinite matrix
 factorization, are typically the bottleneck in NLP solution methods.
 Parallelizing this operation has been considered to be challenging,
@@ -178,7 +177,20 @@ with JuMP.jl) by an order of magnitude. This finding underscores the
 importance of harnessing the power of GPUs for tackling
 the computational challenges in power systems.
 
-\subsection{Related Work}
+\paragraph*{Contributions}
+We present, for the first time, a nonlinear optimization framework
+that can run entirely on GPU, with all the performance-critical data
+arrays residing exclusively on GPUs. Additionally, we introduce the
+concept of SIMD abstraction for NLP problems, which results in an
+efficient implementation of GPU-accelerated automatic differentiation,
+leading to a 50x speedup compared to existing tools for large-scale
+OPFs. Furthermore, we propose the condensed IPM with inequality
+relaxation strategy for the first time, enabling the treatment of the
+KKT systems of equality-constrained NLPs without numerical pivoting,
+thus allowing the solution of sparse, large-scale NLPs (with a
+prominent example being AC OPFs) on GPUs.
+
+\paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
 nonlinear optimization problems. Cao et al. \cite{cao2016augmented}
 proposed an augmented Lagrangian interior-point approach that employs
@@ -191,12 +203,22 @@ strategy, the authors have investigated the use of reduction
 strategies (state variable elimination) to treat KKT systems in a
 dense form on the GPU
 \cite{pacaud2023parallel,pacaud2022feasible,pacaud2023accelerating,cole2023exploiting}.
+In parallel, approaches based on Lagrangian decomposition and
+batched nonlinear optimzition solver based on TRON algorithm \cite{lin1999newton}
+has been investigated \cite{kim2022accelerated,kim2021leveraging}.
 An NLP solver for high-performance computers (HPC) with GPU
 accelerators called HiOP has been under development
-\cite{hiop_techrep}, with a similar scope as our solver
-MadNLP.jl.
+\cite{hiop_techrep}, with a similar scope as our solver MadNLP.jl.
+The implementation of derivative evaluations with the exploitation of
+repeated structures within model equations has, to the best of our
+knowledge, been first introduced in Gravity \cite{Gravity}. This was
+achieved through the introduction of so-called template constraints,
+and multi-threaded derivate evaluation has been implemented therein.
+However, it is important to note that their differentiation approach
+is based on symbolic differentiation.
 
-\subsection{Organization}
+
+\paragraph*{Organization}
 The paper is organized as follows. In the remainder of the current
 section, we introduce the mathematical notation. In Section
 \ref{sec:prelim}, we provide general preliminary knowledge on
@@ -920,8 +942,9 @@ fixed pivot sequence from KLU.  Software and hardware details of each
 configuration are illustrated in Table \ref{tbl:settings}. The AC OPF
 problem is formulated using the model from the rosetta-opf project
 \cite{rosetta-opf}, and the test cases are obtained from the pglib-opf
-repository \cite{babaeinejadsarookolaee2019power}. The external
-packages are called from Julia, through thin wrapper
+repository \cite{babaeinejadsarookolaee2019power}. We have selected
+the goc and pegase cases, as they contain large-scale instances.  The
+external packages are called from Julia, through thin wrapper
 packages, such as Ipopt.jl and AmplNLWriters.jl. A tolerance of
 $10^{-4}$ is set for MadNLP.jl and Ipopt solvers, with other solver
 options adjusted to ensure a fair comparison across different
