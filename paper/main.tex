@@ -1,6 +1,7 @@
 \input{preamble}
-\title{Accelerating Optimal Power Flow with GPUs: SIMD Abstraction of Nonlinear Programs and Condensed-Space Interior-Point Methods 
+\title{Accelerating Optimal Power Flow with GPUs: SIMD Abstraction of Nonlinear Programs and Condensed-Space Interior-Point Methods
 }
+
 
 \date{\small
   $^{1}$Mathematics and Computer Science Division, Argonne National Laboratory\\
@@ -27,7 +28,7 @@ constraints to inequalities and condensing the Karush-Kuhn-Tucker
 system into a much smaller positive definite matrix. This strategy
 offers the key advantage of being able to factorize the KKT matrix
 without numerical pivoting, which in the past has hampered the parallelization of
-the algorithm.  By combining these two strategies, we can perform the
+the algorithm. By combining these two strategies, we can perform the
 majority of operations on GPUs while keeping the data residing in the
 device memory only. Comprehensive numerical benchmark results showcase
 the substantial computational advantage of our approach. Remarkably,
@@ -115,14 +116,14 @@ condensed-space interior-point method (IPM) with an inequality
 relaxation strategy, which facilitates the use of highly efficient
 {\it refactorization} routines for sparse matrix factorization with
 fixed pivot sequences.
- 
+
 While derivative evaluation can be generally cheaper than linear
-algebra operations, our numerical results show that AD often
-constitutes more than half of the total solver time when using
-off-the-shelf AD implementations like JuMP.jl or AMPL. Instead of the
-general-purpose tools, our method leverages a specialized AD
+algebra operations, our numerical results on AC OPF problems
+show that AD often constitutes more than half of the total solver time when using
+off-the-shelf AD implementations like JuMP.jl~\cite{dunning2017jump} or AMPL~\cite{fourer1990modeling}. Instead,
+our method leverages a specialized AD
 implementation based on the SIMD abstraction of NLPs. This abstraction
-alllows to preserve the parallelizable structure within the model
+allows to preserve the parallelizable structure within the model
 equations, facilitating efficient derivative evaluations on the
 GPU. The AC power flow model is particularly well-suited for this
 abstraction as it involves repetitive expressions for each component
@@ -156,12 +157,12 @@ refactorization), an efficient implementation of which is available in the CUDA 
 Although this method is susceptible to numerical stability issues due to
 increased condition number in the KKT system, our results demonstrate
 that the solver is robust enough to solve problems with a relative
-accuracy of $\epsilon_{\text{mach}}^{1/4}\approx 10^{-4}$. 
+accuracy of $\epsilon_{\text{mach}}^{1/4}\approx 10^{-4}$.
 
 We present numerical benchmark results to showcase the efficiency of
 our method, utilizing our implementations: MadNLP.jl and
 SIMDiff.jl. The solution of the KKT system is performed using the
-external cuSOLVER library. To assess the performance of our method, we
+external {\tt cuSOLVER} library. To assess the performance of our method, we
 compare it against standard CPU approaches using the data available in
 pglib-opf \cite{wachter2006implementation}.  Our benchmark results
 demonstrate that our proposed computational framework has significant
@@ -171,7 +172,7 @@ Specifically, when running on NVIDIA GPUs, our method achieves a
 notable 4x speedup compared to our solver running on CPU, in the case
 of the largest instance. Moreover for the same instance, our approach
 surpasses the performance of existing tools (such as Ipopt interfaced
-with JuMP.jl) by an order of magnitude.  This finding underscores the
+with JuMP.jl) by an order of magnitude. This finding underscores the
 importance of harnessing the power of GPUs for tackling
 the computational challenges in power systems.
 
@@ -190,7 +191,7 @@ dense form on the GPU
 \cite{pacaud2023parallel,pacaud2022feasible,pacaud2023accelerating,cole2023exploiting}.
 An NLP solver for high-performance computers (HPC) with GPU
 accelerators called HiOP has been under development
-\cite{hiop_techrep}, which has a similar scope as our solver
+\cite{hiop_techrep}, with a similar scope as our solver
 MadNLP.jl.
 
 \paragraph*{Organization}
@@ -210,10 +211,10 @@ are given in Section \ref{sec:conc}.
 We denote the set of real numbers and the set of integers by
 $\mathbb{R}$ and $\mathbb{I}$. We let $[M]:=\{1,2,\cdots,M\}$. We let
 $[v_i]_{i\in[M]}:=[v_1;v_2;\cdots,v_M]$.  A vector of ones with an
-appropriate size is denoted by $\boldsymbol{1}$. An identiy matrix
+appropriate size is denoted by $\boldsymbol{1}$. An identity matrix
 with an appropriate size is denoted by $I$. For matrices $A$ and $B$,
 $A\succ(\succeq) B$ indicates that $A-B$ is positive (semi)-definite
-while $A>(\geq) B$ denotes a componentwise inequality. We use the
+while $A>(\geq) B$ denotes a component-wise inequality. We use the
 following convention for any symbol $x$: $X:=\diag(x)$.
 
 \section{Preliminaries}\label{sec:prelim}
@@ -222,18 +223,14 @@ optimization, AD, and GPU computing.
 
 \subsection{Numerical Optimization}\label{sec:numopt}
 We consider NLPs of the following form:
-\begin{subequations}\label{eqn:cpt}
-  \begin{align}
-    \min_{x^\flat \leq x \leq x^\sharp}\;
-    & f(x)\\
-    \st\;
-    & g(x) =0. \label{eqn:cpt-con}
-  \end{align} 
-\end{subequations}
+\begin{equation}\label{eqn:cpt}
+    \min_{x^\flat \leq x \leq x^\sharp}\;  f(x) \quad \st\;
+     g(x) =0 \, .
+\end{equation}
 Numerous solution algorithms have been developed in the NLP
 literature. In terms of strategies to deal with inequality
 constraints, the NLP solution algorithms can be broadly classified
-into active-set methods and IPMs \cite{nocedal2006numerical}.
+into active-set methods and interior-point methods (IPMs) \cite{nocedal2006numerical}.
 Active-set methods aim to find the set of active constraints associated
 with the optimal solution in a combinatorial manner, while IPMs
 replace inequality constraints with smooth barrier functions, enabling
@@ -244,13 +241,13 @@ the KKT matrix. Given these advantages, we have chosen IPMs as the
 backbone algorithm for developing our optimization methods on GPUs.
 
 In terms of practical computations, three key components play
-vital roles: derivative evalutions (often provided by the AD
+vital roles: derivative evaluations (often provided by the AD
 capabilities of the algebraic modeling languages), linear algebra
 operations, and various internal computations within the
 solver. Notably, most of the computational efforts are delegated to
 the external linear solver and AD library, while the optimization solver
 orchestrates the operation of these tools to drive the solution
-iterate towards the stationary point of the optimization problem. 
+iterate towards the stationary point of the optimization problem.
 
 
 Since the successful implementation of the open-source IPM solver in
@@ -259,7 +256,7 @@ Ipopt, many subsequent implementations of NLP solvers
 based their implementation on Ipopt
 \cite{wachter2006implementation}. We also use Ipopt as our main
 reference for the IPM implementation. Below, we outline the overall
-computational procedure employed wihtin the NLP solution frameworks:
+computational procedure employed within the NLP solution frameworks:
 
 1) Given the current primal-dual iterate $(x^{(\ell)},y^{(\ell)},
 z^{\flat(\ell)},z^{\sharp(\ell)})$, the AD package evaluates:
@@ -298,7 +295,7 @@ where
   &&A^{(\ell)}:= \nabla_xg(x^{(\ell)})\\
   \Sigma^{(\ell)}&:= (X^{(\ell)})^{-1}Z^{(\ell)}\\
   r_x^{(\ell)}
-  &:=\nabla_x f(x^{(\ell)}) - \mu (X^{(\ell)})^{-1} \boldsymbol{1}, 
+  &:=\nabla_x f(x^{(\ell)}) - \mu (X^{(\ell)})^{-1} \boldsymbol{1},
   &&r_y^{(\ell)}:=g(x^{(\ell)}),
 \end{align*}
 and $\delta^{(\ell)}_w, \delta^{(\ell)}_c>0$ are the regularization parameters
@@ -310,7 +307,7 @@ applying the determined step size and direction. This process is
 repeated until convergence criteria (typically based on the residual
 to the first-order optimality conditions) are satisfied.
 
-\subsection{AD}
+\subsection{Automatic Differentiation}
 Numerical differentiation of computer programs can be achieved through
 three different methods: (i) finite difference method, (ii) symbolic
 differentiation, and (iii) AD. The finite difference method suffers
@@ -325,22 +322,21 @@ struggles to compute the derivatives of long nested expressions in a
 computationally efficient way.
 
 In contrast, AD differentiates computer
-programs by leveraging the computation graph. By inspecting the
-computation graph and applying chain rules, AD
-can efficiently and accurately evaluate derivatives. This approach has
-become the dominant paradigm for derivative computation within the
+programs by inspecting the computation graph and applying chain rules,
+to evaluate derivatives efficiently and accurately.
+This approach has become the dominant paradigm for derivative computation within the
 scientific computing domain, including NLP and
 machine learning. For large-scale optimization, such as AC OPFs, AD
 tools are often implemented as part of domain-specific modeling
-languages, such as JuMP, CasADi, and AMPL (optimization) and Torch and
+languages, such as JuMP, CasADi, and AMPL (optimization) and Tensorflow, Torch and
 Flux (machine learning).
 
 There are two alternative ways of propagating derivatives through the
 recursive application of chain rules: (i) forward-mode and (ii)
-reverse-mode, which operate in opposite directions (from leaves to
-root and from root to leaves, respectively). Reverse-mode automatic
-differentiation, also known as an adjoint method, has proven to be
-particularly effective for dealing with the function expressions in
+reverse-mode, which operate in opposite directions (respectively, from leaves to
+root and from root to leaves). Reverse-mode automatic
+differentiation, also known as the adjoint method, has proven to be
+particularly effective for dealing with function expressions in
 large-scale optimization problems.
 
 The Julia Language, our language of choice, offers convenient and
@@ -377,7 +373,7 @@ efficient implementations on GPUs. On the other hand, when the
 algorithm's structure allows for efficient parallelization, the SIMD
 parallelism in GPUs can offer orders of magnitudes speedup.
 
-We highlight that the following, arguably quite common, computational
+We highlight that the following, arguably common, computational
 patterns are particularly effective when implemented on GPUs:
 \begin{align}
   y&\leftarrow \left[\phi(x; q_j)\right]_{j\in [J]}\tag{Pattern 1}\label{eqn:pattern-1}\\
@@ -409,7 +405,7 @@ patterns and the use of custom kernels.
 Many of the operations required in AD of sparse physical models, as
 well as the application of optimization algorithms, are based on the
 computational patterns mentioned above. For example, an AC OPF model can
-be implemented with 15 different computational patterns, most of which
+be implemented with 15 different computational patterns (see Section~\ref{sec:simd:ad}), most of which
 fall within the aforementioned categories. Furthermore, the
 computation within optimization solvers, such as forming the
 left-hand-side for the KKT systems, computing the $\|\cdot\|_\infty$
@@ -428,7 +424,7 @@ tools, MadNLP.jl and SIMDiff.jl, are implemented in the Julia Language,
 by leveraging its kernel and array programming capabilities.
 
 \begin{figure}[t]
-  \centering 
+  \centering
   \begin{tikzpicture}[remember picture, scale=.9, font=\small]
     \node[draw,align=left] (I) at (0,2.75) {
       $\bullet$ Instruction $g(\cdot,\cdot)$\\
@@ -505,7 +501,7 @@ model equations in \eqref{eqn:prob} is amenable to SIMD parallelism.
 To implement the SIMD abstraction in the modeling environment, the
 algebraic modeling interface in SIMDiff.jl enforces the users to
 specify the model equations in an {\tt Iterable} data type in
-Julia Language. This composite data type consists of an instruction (a julia
+Julia Language. This composite data type consists of an instruction (a Julia
 function) and data (a host or device array) over which the instruction
 is executed. This naturally facilitates maintaining the NLP model
 information in the form of SIMD abstraction in \eqref{eqn:prob}, and
@@ -513,16 +509,17 @@ facilitates the model evaluation and differentiation on GPU
 accelerators.
 
 \subsection{Parallel AD}
-Many of the physics-based models, such as AC OPF, have a highly repetitive
+\label{sec:simd:ad}
+Many physics-based models, such as AC OPF, have a highly repetitive
 structure. One of the manifestations of it is that the mathematical
 statement of the model is concise, even if the practical model may contain
 millions of variables and constraints. This is possible due to the use of
 repetition over a certain index and data sets. For example,
 it suffices to use 15 computational patterns to fully specify the
 AC OPF model. These patterns arise from (1) generation cost, (2) reference
-bus voltage angle constraint, (3-6) active and reactive power flow (to
-and from), (7) voltage angle difference constraint, (8-9) apparent
-power flow limits (to and from), (10-11) power balance equations,
+bus voltage angle constraint, (3-6) active and reactive power flow (from and to),
+(7) voltage angle difference constraint, (8-9) apparent
+power flow limits (from and to), (10-11) power balance equations,
 (12-13) generators' contributions to the power balance equations, and
 (14-15) in/out flows contributions to the power balance
 equations. However, such repetitive structure is not well exploited
@@ -543,7 +540,7 @@ second order derivatives using GPU accelerators.
 
 \subsection{Sparsity Analysis}
 The sparsity analysis is needed for determining the sparsity pattern
-of the evaluated derivatives. In the case of large-sclae sparse
+of the evaluated derivatives. In the case of large-scale sparse
 problems, the initial sparsity analysis of nonlinear expressions can
 be expensive, as the sparsity should be analyzed for potentially
 millions of objective terms and constraints. However, oftentimes
@@ -575,17 +572,12 @@ At the beginning of the algorithm, we apply inequality relaxation to replace the
 \begin{align}\label{eqn:relax}
   g(x)- s = 0,\quad s^{\flat}\leq s\leq  s^\sharp,
 \end{align}
-where $s^\flat,s^\sharp\in\mathbb{R}^{m}$ are chosen to be close to zero.
+where $s^\flat,s^\sharp\in\mathbb{R}^{m}$ are lower and upper bounds chosen to be close to zero.
 This relaxed problem can be stated as follows:
-\begin{align}\label{eqn:relaxed} 
-  \begin{aligned}[t]
+\begin{equation}\label{eqn:relaxed}
     \min_{\big[\substack{x^\flat\\s^\flat}\big]\leq \big[\substack{x\\s}\big] \leq \big[\substack{x^\sharp\\s^\sharp}\big]}\;
-    &  f(x)\\
-    \st\;
-    & g(x) - s = 0.
-  \end{aligned}
-\end{align}
-
+      f(x)\quad \st\;  g(x) - s = 0 \, .
+\end{equation}
 In our implementation, we set $s^{\flat},s^\sharp$ as
 $-\epsilon_{\text{tol}}\boldsymbol{1}$ and $+\epsilon_{\text{tol}}\boldsymbol{1}$, respectively,
 where $\epsilon_{\text{tol}}>0$ is a user-specified relative tolerance
@@ -607,7 +599,7 @@ IPM.
 The IPM replaces the equality and inequality-constrained problem in \eqref{eqn:relax} with an equality-constrained  barrier subproblem:
 \begin{subequations}\label{eqn:barrier}
   \begin{align}
-    \min_{x}\;
+    \min_{x, s}\;
     &
       \begin{aligned}[t]
         &f(x) - \mu\boldsymbol{1}^\top \log (x- x^\flat) -\mu\boldsymbol{1}^\top \log (x^\sharp -x)\\
@@ -615,7 +607,7 @@ The IPM replaces the equality and inequality-constrained problem in \eqref{eqn:r
       \end{aligned}
           \label{eqn:barrier-obj}\\
     \st\;
-    &g(x) = 0. \label{eqn:barrier-con}
+    &g(x) - s = 0. \label{eqn:barrier-con}
   \end{align}
 \end{subequations}
 Here, $\mu>0$ is the barrier parameter. The smooth log-barrier
@@ -625,10 +617,9 @@ the first-order stationary point can be achieved by repeatedly
 applying Newton's step to the KKT conditions of \eqref{eqn:barrier}
 with $\mu\searrow 0 $.
 
-
 \subsection{Newton's Step Computation}
 The Newton step direction is computed by solving a so-called KKT system; to explain this, we consider the first-order optimality conditions (KKT conditions) for the barrier subproblem in \eqref{eqn:barrier}:
-\begin{align}\label{eqn:first} 
+\begin{align}\label{eqn:first}
   \begin{aligned}[t]
     \nabla_{x} f(x) - \nabla_{x}g(x)^\top y  - z_x^\flat  + z_x^\sharp = 0\;&\\
     \begin{aligned}
@@ -638,7 +629,7 @@ The Newton step direction is computed by solving a so-called KKT system; to expl
     \end{aligned}
     \quad
     \begin{aligned}
-      g(x) &= 0\\
+      g(x) - s  &= 0\\
       Z^\sharp_x (x^\sharp-x) - \mu\boldsymbol{1}&= 0\\
       Z^\sharp_s (s^\sharp-s) - \mu\boldsymbol{1}&= 0,
     \end{aligned}&
@@ -648,7 +639,7 @@ where $y\in\mathbb{R}^{m}$, $z_x^\flat,z_x^\sharp\in\mathbb{R}^{n}$,
 and $z_s^\flat,z_s^\sharp\in\mathbb{R}^{m}$ are Lagrange multipliers
 associated with the equality and bound constraints in
 \eqref{eqn:relaxed}. The Newton step for solving the nonlinear
-equations in \eqref{eqn:first} can be computed by solving the KKT system in \eqref{eqn:very-long-eqn}.
+equations in \eqref{eqn:first} can be computed by solving the unreduced KKT system in \eqref{eqn:very-long-eqn}.
 \begin{figure*}[h!]
   % \begin{strip}
   % \hline
@@ -686,7 +677,7 @@ equations in \eqref{eqn:first} can be computed by solving the KKT system in \eqr
 % \hline
 % \end{strip}
 \end{figure*}
-Here, we recall the definitions of $W^{(\ell)}$ and $A^{(\ell)}$ from Section \ref{sec:numopt}, and 
+Here, we recall the definitions of $W^{(\ell)}$ and $A^{(\ell)}$ from Section \ref{sec:numopt}, and
 $p^{(\ell)}_x,\cdots p^{(\ell)}_{z_s^\sharp}$ are defined by the left-hand-sides of the equations in
 \eqref{eqn:first}. In sequel, we shall drop the superscript
 $(\cdot)^{(\ell)}$ for concise notation.
@@ -736,7 +727,7 @@ The bound dual steps can be recovered as follows:
   \end{aligned}
 \end{align}
 Note that the matrices involved in the inversions in \eqref{eqn:recover-1}
-are always diagonal, so their computation is not expensive.
+are always diagonal, so their computation is cheap.
 Also, note that the reduced system in \eqref{eqn:very-long-reduced}
 corresponds to the KKT system in \eqref{eqn:kkt-indefinite}. However,
 in the original version of the algorithm, we did not introduce the
@@ -764,13 +755,14 @@ and the dual and slack step directions can be recovered by:
   \Delta y &:= (\Sigma_s + \delta_w I) \Delta s -q_s.\label{eqn:recover-2}
 \end{align}
 Again, the matrices involved in the inversions above are always
-diagonal, so their computation is not expensive.
+diagonal, so their computation is cheap.
 
 Therefore, the only sparse matrix that needs to be factorized is the
-matrix in \eqref{eqn:very-long-condensed}, which is in
-$\mathbb{R}^{n\times n}$. In general NLPs, the condensation strategy
+matrix in the left-hand-side of \eqref{eqn:very-long-condensed}, with
+dimension $n \times n$.
+In general NLPs, the condensation strategy
 can arbitrarily increase the density of the KKT system, but for AC OPF
-problems, the condensed KKT system is still sparse.
+problems, the condensed KKT system remains sparse.
 This is because the maximum number of nonzeros per row in constraint
 Jacobian is bounded by the graph degree, which should be reasonably
 small in practice.
@@ -781,7 +773,7 @@ definite upon the application of standard inertia correction
 method. Typically, to guarantee that the computed step direction is a
 descent direction, we need a condition that
 $\text{inertia}(M_\text{red}) = (n+5m,0,m)$. Here, inertia refers to
-the tuple of positive, zero, and negative eigenvalues. Accoridngly, we
+the tuple of positive, zero, and negative eigenvalues. Accordingly, we
 employ inertia correction methods to modify the augmented KKT system
 so that the desired conditions on the inertia is satisfied.
 
@@ -791,13 +783,13 @@ By Sylvester's law, we have:
   &\iff \text{inertia}(M_\text{cond}) = (n,0,0).
 \end{align*}
 Thus, any choice of $\delta_w,\delta_c>0$ that makes the condensed KKT
-system positive definite yields the the desired inertia condition.
+system positive definite yields the desired inertia condition.
 An important observation here is that the condensed KKT matrix
 with desired inertia condition is always positive definite.
 Thus, $M_{\text{cond}}$ can be factorized with fixed pivoting (e.g.,
 Cholesky factorization or LU refactorization), which is significantly
 more amenable to parallel implementation than indefinite LBL$^\top$
-factorization, which is standard in the state-of-the-art CPU
+factorization, which is standard in the state-of-the-art IPM
 algorithms but requires the use of pivoting.
 
 Although we call \eqref{eqn:very-long-condensed} a condensed KKT system,
@@ -832,7 +824,7 @@ of the implementation of the filter line search and various additional
 strategies, the readers are referred to
 \cite{wachter2006implementation}.
 
-The step size and diretion obtained above can be implemented as follows:
+The step size and direction obtained above can be implemented as follows:
 \begin{align}
   (x,s,y) &\leftarrow (x,s,y)+ \alpha (\Delta x, \Delta s, \Delta y),\label{eqn:iter}\\\nonumber
   (z_x^\flat, z_x^\sharp, z_s^\flat, z_s^\sharp) &\leftarrow (z_x^\flat, z_x^\sharp, z_s^\flat, z_s^\sharp) + \alpha_z (\Delta z_x^\flat, \Delta z_x^\sharp, \Delta z_s^\flat, \Delta z_s^\sharp).
@@ -868,7 +860,7 @@ condensed-space IPM in Algorithm \ref{alg:con-ipm}.
 
 \subsection{Notes on the Implementation}
 We have implemented the condensed-space IPM by adapting our code base
-in MadNLP.jl, which implements the IPM as in Ipopt in Julia Language.
+in MadNLP.jl, a port of Ipopt in Julia Language.
 A key feature of MadNLP is that the IPM is implemented with
 high levels of abstractions, while the specific handling of the data
 structures within the KKT systems is carried out by data-type specific
@@ -898,7 +890,7 @@ AC OPF problems.
 
 \subsection{Methods}
 
-We compared four different configurations of NLP soultion frameworks:
+We compared four different configurations of NLP solution frameworks:
 \begin{align}
   \label{config-1}\tag{Config 1} \bullet\;&\text{MadNLP.jl + SIMDiff.jl + cuSOLVER (GPU)}\\
   \label{config-2}\tag{Config 2} \bullet\;&\text{MadNLP.jl + SIMDiff.jl + Ma27 (CPU)}\\
@@ -916,7 +908,7 @@ along with the inequality relaxation strategy, while in
 \ref{config-2}, MadNLP.jl applies IPM based on the indefinite,
 non-condensed KKT system, as in \eqref{eqn:kkt-indefinite}. In
 \ref{config-1}, we use the cuSOLVER library to solve the condensed KKT
-system. The initial symbolic factorization is performed using the KLU
+system. The initial symbolic factorization is performed on the CPU using the KLU
 package \cite{davis2010algorithm}, and the subsequent numerical
 factorization and triangular solves are performed by cuSOLVER with the
 fixed pivot sequence from KLU.  Software and hardware details of each
@@ -947,10 +939,10 @@ speedup brought by GPUs, by comparing the timing results of
   \scriptsize
   \centering
   \caption{Details of Numerical Experiment Settings}
-  \begin{tabular}{|l|c|c|c|c|} 
+  \begin{tabular}{|l|c|c|c|c|}
     \hline
-    & {\textbf{MadNLP.jl + SIMDiff.jl + cuSOLVER}} 
-    & {\textbf{MadNLP.jl + SIMDiff.jl + Ma27}} 
+    & {\textbf{MadNLP.jl + SIMDiff.jl + cuSOLVER}}
+    & {\textbf{MadNLP.jl + SIMDiff.jl + Ma27}}
     & {\textbf{Ipopt + AMPL + Ma27}}
     & {\textbf{Ipopt + JuMP.jl + Ma27}}\\
     &\textbf{(gpu)} &\textbf{(cpu)} &\textbf{(cpu)}& \textbf{(cpu)}\\
@@ -961,14 +953,14 @@ speedup brought by GPUs, by comparing the timing results of
     \hline
     \textbf{Linear Solver} &  cuSOLVER (v11.4.5) &\multicolumn{3}{c|}{Ma27 (v2015.06.23)}\\
     \hline
-    \textbf{Hardware} & NVIDIA Quadro GV100 & \multicolumn{3}{c|}{Intel Xeon Gold 6140}\\ 
+    \textbf{Hardware} & NVIDIA Quadro GV100 & \multicolumn{3}{c|}{Intel Xeon Gold 6140}\\
     \hline
   \end{tabular}\\
   $^*$Specific commit hashes are available at \url{https://github.com/sshin23/opf-on-gpu}
-  \label{tbl:settings} 
+  \label{tbl:settings}
 \end{table*}
 \begin{table*}[t]
-  \scriptsize 
+  \scriptsize
   \centering
   \caption{Numerical Results}
   \input{table.tex}\\
@@ -1001,7 +993,7 @@ degree of effectiveness in terms of IPM convergence.
 Next, we discuss the effectiveness of parallel AD on GPUs. We observe
 that even on CPUs, SIMDiff.jl is substantially faster than the AD
 routines implemented in AMPL or JuMP.jl. This efficiency arises from
-SIMDiff.jl obtaining the derivative functions specifcially compiled
+SIMDiff.jl obtaining the derivative functions specifically compiled
 for the type of model, which is optimized for the distinctive
 computational pattern in the model. When comparing SIMDiff.jl running
 on CPUs and GPUs, we observe a further speedup of up to almost 20x for
@@ -1010,7 +1002,7 @@ faster than JuMP.jl. This demonstrates that parallelization of AD
 brings significant computational gain.
 This is because most operations in the derivative
 evaluations are \ref{eqn:pattern-1}
-operations, which are highly effective on GPUs.
+operations, highly effective on GPUs.
 
 We next discuss the linear solver time.  While the speedup achieved by
 linear solvers is only moderate, this has a high impact on the overall
@@ -1063,7 +1055,7 @@ challenges posed by ill-conditioning remains to be an important aspect
 for future work. In the following paragraphs, we discuss some
 remaining open questions and future outlooks.
 
-\paragraph*{Obtaining Higher Numerical Precisions}
+\paragraph*{Obtaining Higher Numerical Precision}
 While we have focused on the IPM, other constrained optimization
 paradigms, such as penalty methods and augmented Lagrangian methods
 exist, and similar strategies based on condensed linear systems can be
@@ -1103,22 +1095,22 @@ incorporating cross-architecture linear solvers, we envision
 supporting broader class of GPU accelerators in the future.
 
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{ieeetr}
 \bibliography{main}
 \vspace{0.1cm}
 \begin{flushright}
-	\scriptsize \framebox{\parbox{2.5in}{Government License: The
-			submitted manuscript has been created by UChicago Argonne,
-			LLC, Operator of Argonne National Laboratory (``Argonne").
-			Argonne, a U.S. Department of Energy Office of Science
-			laboratory, is operated under Contract
-			No. DE-AC02-06CH11357.  The U.S. Government retains for
-			itself, and others acting on its behalf, a paid-up
-			nonexclusive, irrevocable worldwide license in said
-			article to reproduce, prepare derivative works, distribute
-			copies to the public, and perform publicly and display
-			publicly, by or on behalf of the Government. The Department of Energy will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan. http://energy.gov/downloads/doe-public-access-plan. }}
-	\normalsize
+  \scriptsize \framebox{\parbox{2.5in}{Government License: The
+      submitted manuscript has been created by UChicago Argonne,
+      LLC, Operator of Argonne National Laboratory (``Argonne").
+      Argonne, a U.S. Department of Energy Office of Science
+      laboratory, is operated under Contract
+      No. DE-AC02-06CH11357.  The U.S. Government retains for
+      itself, and others acting on its behalf, a paid-up
+      nonexclusive, irrevocable worldwide license in said
+      article to reproduce, prepare derivative works, distribute
+      copies to the public, and perform publicly and display
+      publicly, by or on behalf of the Government. The Department of Energy will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan. http://energy.gov/downloads/doe-public-access-plan. }}
+  \normalsize
 \end{flushright}
 
 \end{document}
