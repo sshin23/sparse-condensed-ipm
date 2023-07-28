@@ -25,7 +25,7 @@ of AD routines that can exploit such structure. Second, we employ a
 condensed-space interior-point method (IPM) with an inequality
 relaxation strategy. This technique involves relaxing equality
 constraints to inequalities and condensing the Karush-Kuhn-Tucker
-system into a much smaller positive definite matrix. This strategy
+system into a much smaller positive definite system. This strategy
 offers the key advantage of being able to factorize the KKT matrix
 without numerical pivoting, which in the past has hampered the parallelization of
 the IPM algorithm. By combining these two strategies, we can perform the
@@ -182,33 +182,33 @@ We present, for the first time, a nonlinear optimization framework
 that can run entirely on GPU, with all the performance-critical data
 arrays residing exclusively on GPUs. Additionally, we introduce the
 concept of SIMD abstraction for NLP problems, which results in an
-efficient implementation of GPU-accelerated automatic differentiation,
-leading to a 50x speedup compared to existing tools for large-scale
+efficient implementation of GPU-accelerated parallel AD, leading to a
+50x speedup compared to existing tools for large-scale
 OPFs. Furthermore, we propose the condensed IPM with inequality
 relaxation strategy for the first time, enabling the treatment of the
-KKT systems of equality-constrained NLPs without numerical pivoting,
-thus allowing the solution of sparse, large-scale NLPs (with a
-prominent example being AC OPFs) on GPUs.
+KKT systems of NLPs without numerical pivoting, thus allowing the
+solution of sparse, large-scale NLPs (with a prominent example being
+AC OPFs) on GPUs.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
 nonlinear optimization problems. Cao et al. \cite{cao2016augmented}
 proposed an augmented Lagrangian interior-point approach that employs
 augmented Lagrangian outer iteration and the treatment of linear
-systems using a preconditioned conjugate gradient method.  Another
-recent development is the hybrid (direct-iterative) KKT system solver
-specifically designed for GPUs \cite{regev2023hykkt}.  Before the
-introduction of the condensed space IPM with an inequality relaxation
+systems using a preconditioned conjugate gradient method. Prior to the
+introduction of the sparse condensed-space IPM with an inequality relaxation
 strategy, the authors have investigated the use of reduction
 strategies (state variable elimination) to treat KKT systems in a
 dense form on the GPU
-\cite{pacaud2023parallel,pacaud2022feasible,pacaud2023accelerating,cole2023exploiting}.
+\cite{pacaud2023parallel,pacaud2022feasible,pacaud2023accelerating}.
 In parallel, approaches based on Lagrangian decomposition and
-batched nonlinear optimzition solver based on TRON algorithm \cite{lin1999newton}
+batched with batched TRON solver \cite{lin1999newton}
 has been investigated \cite{kim2022accelerated,kim2021leveraging}.
 An NLP solver for high-performance computers (HPC) with GPU
 accelerators called HiOP has been under development
 \cite{hiop_techrep}, with a similar scope as our solver MadNLP.jl.
+ Another recent development is the hybrid (direct-iterative) KKT
+system solver specifically designed for GPUs \cite{regev2023hykkt}.
 The implementation of derivative evaluations with the exploitation of
 repeated structures within model equations has, to the best of our
 knowledge, been first introduced in Gravity \cite{Gravity}. This was
@@ -216,20 +216,25 @@ achieved through the introduction of so-called template constraints,
 and multi-threaded derivate evaluation has been implemented therein.
 However, it is important to note that their differentiation approach
 is based on symbolic differentiation.
+The idea of condensed-space IPM (without inequlaity relaxation
+strategy) is not new, but they have been used primarily in more
+specific contexts, where the increased nonzero entries in the KKT system
+is less of a concern, such as in the dense form model predictive control
+problems \cite{jerez2012sparse,cole2023exploiting}.
 
 
 \paragraph*{Organization}
 The paper is organized as follows. In the remainder of the current
 section, we introduce the mathematical notation. In Section
 \ref{sec:prelim}, we provide general preliminary knowledge on
-numerical optimization and GPU computing. In Section \ref{sec:simd},
-we present the SIMD abstraction of NLPs and their advantages in terms
-of implementing parallel AD. Section \ref{sec:ipm} presents the
-optimization algorithm under study, the condensed-space IPM with an
-inequality relaxation strategy. Section \ref{sec:num} presents the
-numerical results, comparing our approach with other state-of-the-art
-solution methods on the CPUs. Finally, conclusions and future outlooks
-are given in Section \ref{sec:conc}.
+numerical optimization, automatic differentiation, and GPU computing.
+In Section \ref{sec:simd}, we present the SIMD abstraction of NLPs and
+their advantages in terms of implementing parallel AD. Section
+\ref{sec:ipm} presents the optimization algorithm under study, the
+condensed-space IPM with an inequality relaxation strategy. Section
+\ref{sec:num} presents the numerical results, comparing our approach
+with other state-of-the-art solution methods on the CPUs. Finally,
+conclusions and future outlooks are given in Section \ref{sec:conc}.
 
 \paragraph*{Notation}
 We denote the set of real numbers and the set of integers by
@@ -239,7 +244,7 @@ appropriate size is denoted by $\boldsymbol{1}$. An identity matrix
 with an appropriate size is denoted by $I$. For matrices $A$ and $B$,
 $A\succ(\succeq) B$ indicates that $A-B$ is positive (semi)-definite
 while $A>(\geq) B$ denotes a component-wise inequality. We use the
-following convention for any symbol $x$: $X:=\diag(x)$.
+convention $X:=\diag(x)$ for any symbol $x$.
 
 \section{Preliminaries}\label{sec:prelim}
 This section covers three essential background topics: numerical
@@ -350,10 +355,11 @@ programs directly by inspecting the computation graph and applying chain rules,
 to evaluate derivatives efficiently and accurately.
 This approach has become the dominant paradigm for derivative computation within the
 scientific computing domain, including NLP and
-machine learning. For large-scale optimization problems, such as AC OPFs, AD
-tools are often implemented as part of domain-specific modeling
-languages, such as JuMP, CasADi, and AMPL (optimization) and Tensorflow, Torch and
-Flux (machine learning).
+machine learning. For large-scale optimization problems, such as AC
+OPFs, AD tools are often implemented as part of domain-specific
+modeling languages. Examples of such modeling languages include JuMP,
+CasADi, and AMPL (optimization) and Tensorflow, Torch and, Flux
+(machine learning).
 
 There are two alternative ways of propagating derivatives through the
 recursive application of chain rules: (i) forward-mode and (ii)
@@ -365,25 +371,26 @@ large-scale optimization problems.
 
 The Julia Language, our language of choice, offers convenient and
 efficient ways to implement automatic differentiation. Through the use
-of the multiple dispatch paradigm~\cite{bezanson2017julia} \textit{any Julia function} ---
-including commonly used operations like addition, multiplication,
-trigonometric and exponential functions (among others) --- can be easily
-overloaded. Multiple dispatch allows functions to be dynamically
-dispatched based on the run-time type, a crucial feature for
-implementing differentiable programming. Several AD implementations
-have been developed in Julia Language, such as ReverseDiff.jl,
-ForwardDiff.jl, Zygote.jl, and JuMP.jl. While these tools are general
-and useful for various applications, they are not optimized for
-evaluating derivatives of AC OPF problems, as they are not designed to
-exploit the parallelizable structures in the model.
+of the multiple dispatch paradigm~\cite{bezanson2017julia} \textit{any
+Julia function}---including commonly used operations like addition,
+multiplication, trigonometric and exponential functions (among
+others)---can be easily overloaded. Multiple dispatch allows functions
+to be dynamically dispatched based on the run-time type, a crucial
+feature for implementing differentiable programming. Several AD
+implementations have been developed in Julia Language, such as
+ReverseDiff.jl, ForwardDiff.jl, Zygote.jl, and JuMP.jl. While these
+tools are general and useful for various applications, they are not
+optimized for evaluating derivatives of AC OPF problems, as they are
+not designed to exploit the parallelizable structures in the model,
+while preserving the desired sparsity.
 
 
 \subsection{GPU Computing}\label{sec:gpu}
 With the increasing prevalence of GPU in various scientific computing
 domains, there has been growing interest in leveraging these emerging
 architectures to efficiently solve large-scale NLPs, like AC OPF problems.
-However, adapting a NLP solution algorithms
-such as IPM to GPUs presents challenges due to the fundamental
+However, adapting a NLP solution algorithms,
+such as IPM, to GPUs presents challenges due to the fundamental
 differences between GPU and CPU programming paradigms. While CPUs
 execute a sequence of instructions on a single input (single
 instruction, single data, or SISD, in Flynn's taxonomy), GPUs run the
@@ -418,25 +425,26 @@ each thread employed can operate independently without needing to
 simultaneously manipulate the same device memory location. While
 \ref{eqn:pattern-2} and \ref{eqn:pattern-3} are less effective,
 they still can be significantly
-faster than operations in CPUs, as substantial part of the operation
+faster than operations on CPUs, as substantial part of the operation
 can still be parallelized by the use of buffers. In simple cases, the
 implementation of these operations can be performed with the standard
 {\tt map} and {\tt mapreduce} programming models. However, in more
-complex cases, especially for \ref{eqn:pattern-3}, the
-implementation may require pre-inspection of memory write-access
-patterns and the use of custom kernels.
+complex cases, especially for \ref{eqn:pattern-3}, the implementation
+may require pre-inspection of memory write-access patterns and the use
+of custom kernels.
 
 Many of the operations required in AD of sparse physical models, as
 well as the application of optimization algorithms, are based on the
-computational patterns mentioned above. For example, an AC OPF model can
-be implemented with 15 different computational patterns (see Section~\ref{sec:simd:ad}), most of which
-fall within the aforementioned categories. Furthermore, the
-computation within optimization solvers, such as forming the
-left-hand-side for the KKT systems, computing the $\|\cdot\|_\infty$
-norm of the constraint violation, and assembling the condensed KKT
-system, can be carried out by using these computational patterns as well. The
-only exception is the factorization of the sparse KKT matrix, which
-requires more sophisticated implementations.
+computational patterns mentioned above. For example, an AC OPF model
+can be implemented with 15 different computational patterns (see
+Section~\ref{sec:simd:ad}), all of which fall within the
+aforementioned categories. Furthermore, the computation within
+optimization solvers, such as forming the left-hand-side for the KKT
+systems, computing the $\|\cdot\|_\infty$ norm of the constraint
+violation, and assembling the condensed KKT system, can be carried out
+by using these computational patterns as well. The only exception is
+the factorization of the sparse KKT matrix, which requires more
+sophisticated implementations.
 
 Implementing kernel functions for the above computational patterns in
 the Julia Language is straightforward, as Julia provides excellent
@@ -517,8 +525,8 @@ that our functions $f^{(l)}(\cdot,\cdot)$, $g^{(m)}(\cdot,\cdot)$, and
 $h^{(n)}(\cdot,\cdot)$ can be expressed with computational
 graphs of moderate length. One can observe that the problem in
 \eqref{eqn:prob} is expressed by the computational patterns in Section
-\ref{sec:gpu}. In particular, the objective function falls within \ref{eqn:pattern-1},
-the first term in the constraint falls within \ref{eqn:pattern-2}, and the second term in the constraint falls within \ref{eqn:pattern-3}.
+\ref{sec:gpu}. In particular, the objective function falls within \ref{eqn:pattern-2},
+the first term in the constraint falls within \ref{eqn:pattern-1}, and the second term in the constraint falls within \ref{eqn:pattern-3}.
 Accordingly, the evaluation and differentiation of the
 model equations in \eqref{eqn:prob} is amenable to SIMD parallelism.
 
@@ -546,13 +554,13 @@ bus voltage angle constraint, (3-6) active and reactive power flow (from and to)
 power flow limits (from and to), (10-11) power balance equations,
 (12-13) generators' contributions to the power balance equations, and
 (14-15) in/out flows contributions to the power balance
-equations. However, such repetitive structure is not well exploited
-in the standard NLP modeling paradigms. In
-fact, without the SIMD abstraction, it is difficult for the AD package
-to detect the parallelizable structure within the model, as it will
-require the full inspection of the computational graph. By preserving
-the repetitive structures in the model, one can facilitate the
-implementation of parallelized derivative computations.
+equations. However, such repetitive structure is not well exploited in
+the standard NLP modeling paradigms. In fact, without the SIMD
+abstraction, it is difficult for the AD package to detect the
+parallelizable structure within the model, as it will require the full
+inspection of the computational graph over all expressions.  By
+preserving the repetitive structures in the model, the repetitive
+structure can be directly available in AD implementation.
 
 Using the multiple dispatch feature of Julia, SIMDiff.jl generates
 highly efficient derivative computation code, specifically compiled
