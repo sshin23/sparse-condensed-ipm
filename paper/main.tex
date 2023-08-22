@@ -1,4 +1,222 @@
-% \input{preamble}
+% \documentclass{IEEEtran4PSCC} % will be used for submission
+% \author{
+%   \IEEEauthorblockN{Sungho Shin and Mihai Anitescu}
+%   \IEEEauthorblockA{
+%     Mathematics and Computer Science Division\\
+%     Argonne National Laboratory\\
+%     Lemont, IL, USA\\
+%     sshin@anl.gov, anitescu@mcs.anl.gov}
+%   \and
+%   \IEEEauthorblockN{François Pacaud}
+%   \IEEEauthorblockA{Centre Automatique et Systèmes\\
+%     Mines Paris - PSL \\
+%     Paris, France\\
+%     francois.pacaud@minesparis.psl.eu}
+% }
+% \psccfooter{%
+%         \parbox{\textwidth}{\hrulefill \\ \small{23rd Power Systems Computation Conference} \hfill \begin{minipage}{0.2\textwidth}\centering \vspace*{4pt} \includegraphics[scale=0.06]{PSCC_logo.png}\\\small{PSCC 2024} \end{minipage} \hfill \small{Paris, France --- June 4 -- 7, 2024}}%
+% }
+
+\documentclass{IEEEtran} % for ArXiv submission
+\author{
+  Sungho Shin, François Pacaud, Mihai Anitescu
+  \thanks{
+    This material is based upon work supported by the U.S. Department of Energy, Office of Science, Office of Advanced Scientific Computing Research (ASCR) under Contract DE-AC02-06CH11347.
+  }
+  \thanks{
+    Sungho Shin and Mihai Anitescu are with Mathematics and Computer Science Division,  Argonne National Laboratory, Lemont, IL, USA. e-mail: \url{sshin@anl.gov}, \url{anitescu@mcs.anl.gov}
+  }
+  \thanks{
+    François Pacaud is with Centre Automatique et Systèmes, Mines Paris - PSL, Paris, France. e-mail: \url{francois.pacaud@minesparis.psl.eu}
+  }
+}
+
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% Set footer
+\makeatletter
+\let\old@ps@headings\ps@headings
+\let\old@ps@IEEEtitlepagestyle\ps@IEEEtitlepagestyle
+\def\psccfooter#1{%
+    \def\ps@headings{%
+        \old@ps@headings%
+        \def\@oddfoot{\strut\hfill#1\hfill\strut}%
+        \def\@evenfoot{\strut\hfill#1\hfill\strut}%
+    }%
+    \def\ps@IEEEtitlepagestyle{%
+        \old@ps@IEEEtitlepagestyle%
+        \def\@oddfoot{\strut\hfill#1\hfill\strut}%
+        \def\@evenfoot{\strut\hfill#1\hfill\strut}%
+    }%
+    \ps@headings%
+}
+\makeatother
+
+
+\usepackage{amsmath,amssymb,amsthm,amsfonts} % assumes amsmath package installed
+\usepackage[linktocpage=true,colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+% \usepackage[letterpaper,margin=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\newcommand{\bx}{\boldsymbol{x}}
+\newcommand{\be}{\boldsymbol{e}}
+\newcommand{\blambda}{\boldsymbol{\lambda}}
+\newcommand{\bLambda}{\boldsymbol{\Lambda}}
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bw}{\boldsymbol{w}}
+\newcommand{\by}{\boldsymbol{y}}
+\newcommand{\bz}{\boldsymbol{z}}
+\newcommand{\bV}{\boldsymbol{V}}
+\newcommand{\bX}{\boldsymbol{X}}
+\newcommand{\bY}{\boldsymbol{Y}}
+\newcommand{\bZ}{\boldsymbol{Z}}
+\newcommand{\bv}{\boldsymbol{v}}
+\newcommand{\bxi}{\boldsymbol{\xi}}
+\newcommand{\bpi}{\boldsymbol{\pi}}
+\newcommand{\bphi}{\boldsymbol{\phi}}
+\newcommand{\bbeta}{\boldsymbol{\eta}}
+\newcommand{\bpsi}{\boldsymbol{\psi}}
+\newcommand{\bzeta}{\boldsymbol{\zeta}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+\newcommand{\bq}{\boldsymbol{q}}
+\newcommand{\bQ}{\boldsymbol{Q}}
+\newcommand{\bK}{\boldsymbol{K}}
+\newcommand{\bP}{\boldsymbol{P}}
+\newcommand{\bS}{\boldsymbol{S}}
+\newcommand{\bT}{\boldsymbol{T}}
+\newcommand{\bF}{\boldsymbol{F}}
+\newcommand{\bG}{\boldsymbol{G}}
+\newcommand{\bd}{\boldsymbol{d}}
+\newcommand{\bp}{\boldsymbol{p}}
+\newcommand{\bff}{\boldsymbol{f}}
+\newcommand{\bc}{\boldsymbol{c}}
+\newcommand{\bg}{\boldsymbol{g}}
+\newcommand{\bh}{\boldsymbol{h}}
+\newcommand{\bA}{\boldsymbol{A}}
+\newcommand{\bL}{\boldsymbol{L}}
+\newcommand{\ba}{\boldsymbol{a}}
+\newcommand{\bb}{\boldsymbol{b}}
+\newcommand{\bB}{\boldsymbol{B}}
+\newcommand{\bC}{\boldsymbol{C}}
+\newcommand{\bE}{\boldsymbol{E}}
+\newcommand{\bH}{\boldsymbol{H}}
+\newcommand{\bR}{\boldsymbol{R}}
+\newcommand{\bn}{\boldsymbol{n}}
+\newcommand{\bm}{\boldsymbol{m}}
+\newcommand{\br}{\boldsymbol{r}}
+\newcommand{\bl}{\boldsymbol{l}}
+\newcommand{\bI}{\boldsymbol{I}}
+\newcommand{\osigma}{\overline{\sigma}}
+\newcommand{\usigma}{\underline{\sigma}}
+\newcommand{\oosigma}{\overline{\osigma}}
+\newcommand{\uusigma}{\underline{\usigma}}
+\newcommand{\olambda}{\overline{\lambda}}
+\newcommand{\ulambda}{\underline{\lambda}}
+\newcommand{\oolambda}{\overline{\olambda}}
+\newcommand{\uulambda}{\underline{\ulambda}}
+\newcommand{\bzero}{\boldsymbol{0}}
+\newcommand{\dist}{\text{\normalfont dist}}
+\newcommand{\st}{\mathop{\text{\normalfont s.t.}}}
+\newcommand{\diag}{\mathop{\text{\normalfont diag}}}
+\newcommand{\amin}{\mathop{\text{\normalfont argmin}}}
+\newcommand{\ReH}{\mathop{\text{\normalfont ReH}}}
+\newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\interior}{\mathop{\text{\normalfont interior}}}
+\newcommand{\relint}{\mathop{\text{\normalfont relint}}}
+\newcommand{\vertices}{\mathop{\text{\normalfont vertices}}}
+\sloppy
+\usepackage{graphicx}
+
+\usepackage{enumitem}
+\usepackage{mathtools}
+\allowdisplaybreaks
+\renewcommand{\theenumi}{(\alph{enumi})}
+% \usepackage{parskip}
+
+\usepackage{tikz}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{cuted}
+\setlength\stripsep{3pt plus 1pt minus 1pt}
+
+\usepackage{listings}
+\lstset{
+basicstyle=\ttfamily\footnotesize,
+columns=fullflexible, % make sure to use fixed-width font, CM typewriter is NOT fixed width
+numbers=left,
+numberstyle=\ttfamily,
+stepnumber=1,
+numbersep=-2pt,
+numberfirstline=true,
+numberblanklines=true,
+tabsize=4,
+lineskip=-1.5pt,
+extendedchars=true,
+breaklines=true,
+keywordstyle=\color{Blue}\bfseries,
+identifierstyle=, % using emph or index keywords
+commentstyle=\sffamily\color{OliveGreen},
+stringstyle=\color{Maroon},
+showstringspaces=false,
+showtabs=false,
+upquote=false,
+texcl=true % interpet comments as LaTeX
+}
+
+
+
+
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+  language         = Julia,
+  basicstyle       = \ttfamily\small,
+  keywordstyle     = \bfseries\color{blue},
+  stringstyle      = \color{magenta},
+  commentstyle     = \color{ForestGreen},
+  showstringspaces = false,
+}
+
+\usepackage{cite}
+
+
 \title{Accelerating Optimal Power Flow with GPUs: SIMD Abstraction of Nonlinear Programs and Condensed-Space Interior-Point Methods
 }
 
@@ -33,7 +251,7 @@ majority of operations on GPUs while keeping the data residing in the
 device memory only. Comprehensive numerical benchmark results showcase
 the substantial computational advantage of our approach. Remarkably,
 for solving large-scale AC OPF problems to a moderate accuracy, our
-implementations—MadNLP.jl and SIMDiff.jl—running on NVIDIA GPUs
+implementations—MadNLP.jl and ExaModels.jl—running on NVIDIA GPUs
 achieve an order of magnitude speedup compared to state-of-the-art
 tools running on contemporary CPUs.
 \end{abstract}
@@ -52,8 +270,8 @@ automatic differentiation (AD) of sparse model equations and the
 parallel factorization of indefinite sparse matrices, which are
 commonly encountered within constrained numerical optimization tasks
 \cite{anitescu2021targeting}. While GPU computation can trivially
-accelerate several parts of the optimization process --- especially
-various internal computations within the optimization solver --- the
+accelerate several parts of the optimization process---especially
+various internal computations within the optimization solver---the
 sluggish data transfer between host and device memory hampers the
 ad-hoc implementation of GPU accelerations (Fig. \ref{fig:memory}). To
 fully leverage the potential offered by modern GPU hardware, it
@@ -108,7 +326,7 @@ majority of operations executed on the GPU.
 This paper presents our approach to implementing a comprehensive
 a computational framework for solving large-scale AC OPF problems on
 NVIDIA GPUs, along with the associated software implementations:
-SIMDiff.jl \cite{simdiff}, an algebraic modeling/AD tool, and MadNLP.jl \cite{madnlp}, an
+ExaModels.jl \cite{simdiff}, an algebraic modeling/AD tool, and MadNLP.jl \cite{madnlp}, an
 NLP solver. Our approach incorporates two novel strategies: (i) a
 single-instruction, multiple-data (SIMD) abstraction of nonlinear
 programs (NLPs), enabling streamlined parallel AD on GPUs, and (ii) a
@@ -140,8 +358,8 @@ approximately 500 times faster.
 Linear algebra operations, especially sparse indefinite matrix
 factorization, are typically the bottleneck in NLP solution methods.
 Parallelizing this operation has been considered to be challenging,
-primarily due to the need for numerical pivoting, which is sequential
-in nature. However, when the matrix can be factorized without
+primarily due to the need for numerical pivoting, which requires irregular
+memory accesses and data movement \cite{swirydowicz2022linear}. However, when the matrix can be factorized without
 numerical pivoting, a significant part of the operation can be
 parallelized, and the numerical factorization can be efficiently
 performed on GPUs. We develop a condensed-space IPM strategy that
@@ -164,7 +382,7 @@ accuracy of $\epsilon_{\text{mach}}^{1/4}\approx 10^{-4}$.
 
 We present numerical benchmark results to showcase the efficiency of
 our method, utilizing our two packages: MadNLP.jl and
-SIMDiff.jl. The solution of the KKT system is performed using the
+ExaModels.jl. The solution of the KKT system is performed using the
 external cuSOLVER library. To assess the performance of our method, we
 compare it against standard CPU approaches using the data available in
 pglib-opf \cite{babaeinejadsarookolaee2019power}.  Our benchmark results
@@ -180,15 +398,16 @@ importance of harnessing the power of GPUs for tackling
 the computational challenges in power systems.
 
 \paragraph*{Contributions}
-We present, for the first time, a nonlinear optimization framework
-that can run entirely on GPU, with all the performance-critical data
-arrays residing exclusively on GPUs. Additionally, we introduce the
-concept of SIMD abstraction for NLP problems, which results in an
-efficient implementation of GPU-accelerated parallel AD. Furthermore,
-we propose the condensed IPM with an inequality relaxation strategy for
-the first time, enabling the treatment of the KKT systems of NLPs
-without numerical pivoting, thus allowing the solution of sparse,
-large-scale NLPs (with a prominent example being AC OPFs) on GPUs.
+We present, for the first time, a sparse nonlinear optimization
+solution framework that can run entirely on GPU, with all the
+performance-critical data arrays residing exclusively on
+GPUs. Additionally, we introduce the concept of SIMD abstraction for
+NLP problems, which results in an efficient implementation of
+GPU-accelerated parallel AD. Furthermore, we propose the condensed IPM
+with an inequality relaxation strategy for the first time, enabling
+the treatment of the KKT systems of NLPs without numerical pivoting,
+thus allowing the solution of sparse, large-scale NLPs (with a
+prominent example being AC OPFs) on GPUs.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
@@ -453,7 +672,7 @@ high-level interfaces for array and kernel programming for GPU
 arrays. The code can even be device-agnostic, thanks to the portable
 programming capabilities brought by KernelAbstractions.jl. All
 of the AD and optimization capabilities in our
-tools, MadNLP.jl and SIMDiff.jl, are implemented in the Julia Language,
+tools, MadNLP.jl and ExaModels.jl, are implemented in the Julia Language,
 by leveraging its kernel and array programming capabilities.
 
 \begin{figure}[t]
@@ -504,7 +723,7 @@ by leveraging its kernel and array programming capabilities.
 
 This section describes our implementation of SIMD abstraction and
 sparse AD of the model equations. The abstraction and AD are
-implemented as part of our algebraic modeling language SIMDiff.jl.
+implemented as part of our algebraic modeling language ExaModels.jl.
 
 
 \subsection{Abstraction}
@@ -533,8 +752,8 @@ Accordingly, the evaluation and differentiation of the
 model equations in \eqref{eqn:prob} is amenable to SIMD parallelism.
 
 To implement the SIMD abstraction in the modeling environment, the
-algebraic modeling interface in SIMDiff.jl enforces the users to
-specify the model equations in an {\tt Iterable} data type in
+algebraic modeling interface in ExaModels.jl enforces the users to
+specify the model equations in an {\tt Generator} data type in
 Julia Language. This composite data type consists of an instruction (a Julia
 function) and data (a host or device array) over which the instruction
 is executed. This naturally facilitates maintaining the NLP model
@@ -564,11 +783,11 @@ inspection of the computational graph over all expressions.  By
 preserving the repetitive structures in the model, the repetitive
 structure can be directly available in AD implementation.
 
-Using the multiple dispatch feature of Julia, SIMDiff.jl generates
+Using the multiple dispatch feature of Julia, ExaModels.jl generates
 highly efficient derivative computation code, specifically compiled
 for each computational pattern in the model. These derivative evaluation codes can be run over the data in various GPU array formats,
 and implemented via array and kernel programming in Julia Language. In
-turn, SIMDiff.jl has the capability to efficiently evaluate first and
+turn, ExaModels.jl has the capability to efficiently evaluate first and
 second-order derivatives using GPU accelerators.
 
 \subsection{Sparsity Analysis}
@@ -581,7 +800,7 @@ these analyses are applied to the same computational patterns, and
 the time and memory spent on sparsity analysis can be significantly
 reduced if the repetitive structures are exploited.
 
-SIMDiff.jl exploits the SIMD abstraction of the model equations to
+ExaModels.jl exploits the SIMD abstraction of the model equations to
 save the computational cost spent for sparsity analysis.  This is
 accomplished by applying sparsity analysis for the instruction for
 each computational pattern and expanding the obtained sparsity pattern
@@ -792,7 +1011,7 @@ diagonal, so their computation is cheap.
 Therefore, the only sparse matrix that needs to be factorized is the
 matrix in the left-hand-side of \eqref{eqn:very-long-condensed}, with
 dimension $n \times n$.  Although we call
-\eqref{eqn:very-long-condensed} a condensed KKT system,
+\eqref{eqn:very-long-condensed} a condensed KKT system, 
 $M_\text{cond}$ is not necessarily a dense matrix. In fact, in the
 case of AC OPF problems, $M_\text{cond}$ is still highly sparse, as
 $W$ and $A$ are graph-induced banded systems.  Thus, exploiting
@@ -922,10 +1141,10 @@ AC OPF problems.
 
 We compared four different configurations of NLP solution frameworks:
 \begin{align}
-  \label{config-1}\tag{Config 1} \bullet\;&\text{MadNLP.jl + SIMDiff.jl + cuSOLVER (GPU)}\\
-  \label{config-2}\tag{Config 2} \bullet\;&\text{MadNLP.jl + SIMDiff.jl + Ma27 (CPU)}\\
-  \label{config-3}\tag{Config 3} \bullet\;&\text{Ipopt + AMPL + Ma27 (CPU)}\\
-  \label{config-4}\tag{Config 4} \bullet\;&\text{Ipopt + JuMP.jl + Ma27 (CPU)}.
+  \label{config-1}\tag{Config 1} \bullet\;&\text{MadNLP.jl+ExaModels.jl+cuSOLVER (GPU)}\\
+  \label{config-2}\tag{Config 2} \bullet\;&\text{MadNLP.jl+ExaModels.jl+Ma27 (CPU)}\\
+  \label{config-3}\tag{Config 3} \bullet\;&\text{Ipopt+AMPL+Ma27 (CPU)}\\
+  \label{config-4}\tag{Config 4} \bullet\;&\text{Ipopt+JuMP.jl+Ma27 (CPU)}.
 \end{align}
 
 \ref{config-1} is our main GPU configuration; \ref{config-2}
@@ -944,7 +1163,7 @@ factorization and triangular solves are performed by cuSOLVER with the
 fixed pivot sequence from KLU.  Software and hardware details of each
 configuration are illustrated in Table \ref{tbl:settings}. The AC OPF
 problem is formulated using the model from the rosetta-opf project
-\cite{rosetta-opf}, and the test cases are obtained from the pglib-opf
+\cite{rosetta-opf}, which is based on the models in PowerModels.jl \cite{8442948}, and the test cases are obtained from the pglib-opf
 repository \cite{babaeinejadsarookolaee2019power}. We have selected
 the goc and pegase cases, as they contain large-scale instances.  The
 external packages are called from Julia, through thin wrapper
@@ -972,15 +1191,15 @@ speedup brought by GPUs, by comparing the timing results of
   \caption{Details of Numerical Experiment Settings}
   \begin{tabular}{|l|c|c|c|c|}
     \hline
-    & {\textbf{MadNLP.jl + SIMDiff.jl + cuSOLVER}}
-    & {\textbf{MadNLP.jl + SIMDiff.jl + Ma27}}
-    & {\textbf{Ipopt + AMPL + Ma27}}
-    & {\textbf{Ipopt + JuMP.jl + Ma27}}\\
-    &\textbf{(gpu)} &\textbf{(cpu)} &\textbf{(cpu)}& \textbf{(cpu)}\\
+    & {\textbf{MadNLP+ExaModels+cuSOLVER}}
+    & {\textbf{MadNLP+ExaModels+Ma27}}
+    & {\textbf{Ipopt+AMPL+Ma27}}
+    & {\textbf{Ipopt+JuMP+Ma27}}\\
+    &\textbf{(GPU)} &\textbf{(CPU)} &\textbf{(CPU)}& \textbf{(CPU)}\\
     \hline
     \textbf{Optimization Solver} & \multicolumn{2}{c|}{MadNLP.jl (dev)$^*$} & \multicolumn{2}{c|}{Ipopt (v3.13.3)} \\
     \hline
-    \textbf{Derivative Evaluations} & \multicolumn{2}{c|}{SIMDiff.jl (dev)$^*$} &  AMPL Solver Library & JuMP.jl (v1.12.0)\\
+    \textbf{Derivative Evaluations} & \multicolumn{2}{c|}{ExaModels.jl (dev)$^*$} &  AMPL Solver Library & JuMP.jl (v1.12.0)\\
     \hline
     \textbf{Linear Solver} &  cuSOLVER (v11.4.5) &\multicolumn{3}{c|}{Ma27 (v2015.06.23)}\\
     \hline
@@ -994,7 +1213,7 @@ speedup brought by GPUs, by comparing the timing results of
   \scriptsize
   \centering
   \caption{Numerical Results}
-  \input{table.tex}\\
+  \input{./include/table.tex}\\
   $^\dag$Wall time (sec) measured by Julia. $^\ddag$CPU time (sec) reported by Ipopt.
   \label{tbl:results}
 \end{table*}
@@ -1003,7 +1222,7 @@ speedup brought by GPUs, by comparing the timing results of
   \centering
   \caption{Solution Quality}
   \label{tbl:quality}
-  \input{table-2.tex}\\
+  \input{./include/table-2.tex}\\
 \end{table*}
 \begin{figure}[t]
   \includegraphics[width=.45\textwidth]{speedup-sol.pdf}
@@ -1023,11 +1242,11 @@ degree of effectiveness in terms of IPM convergence.
 
 \paragraph*{Performance of AD}
 Next, we discuss the effectiveness of parallel AD on GPUs. We observe
-that even on CPUs, SIMDiff.jl is substantially faster than the AD
-routines implemented in AMPL or JuMP.jl. Indeed, SIMDiff.jl generates
+that even on CPUs, ExaModels.jl is substantially faster than the AD
+routines implemented in AMPL or JuMP.jl. Indeed, ExaModels.jl generates
 derivative functions specifically compiled for the type of model,
 including optimization for the distinctive computational pattern found
-in the model. When comparing SIMDiff.jl running on CPUs and GPUs, we
+in the model. When comparing ExaModels.jl running on CPUs and GPUs, we
 observe a further speedup on the GPU of up to almost 20x for large
 instances (e.g., case24465\_goc); remarkably, this is 500 times faster
 than JuMP.jl. This demonstrates that adopting SIMD abstraction and
@@ -1088,7 +1307,7 @@ promising results, achieving a 4x speedup when compared to CPU
 implementations for large-scale AC OPF problems. Notably, our approach
 outperforms one of the state-of-the-art CPU-based implementations by
 a factor of 10. These results, along with our packages
-MadNLP.jl and SIMDiff.jl, showcase a significant advancement in our
+MadNLP.jl and ExaModels.jl, showcase a significant advancement in our
 capabilities in dealing with large-scale optimization problems in
 power systems and underscore the potential of accelerated computing in
 large-scale optimization area. However, the condensation procedure
