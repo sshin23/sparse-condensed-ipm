@@ -7,13 +7,14 @@
   $^\ddag$Centre Automatique et Systèmes, Mines Paris - PSL, Paris, France
 }
 \begin{document}
-\maketitle 
+\maketitle
 
 We are delighted to submit our nominations for the COIN-OR Cup,
-highlighting our contributions of {\bf ExaModels} and {\bf MadNLP} in the field of
-computational infrastructure for operations research, specifically in
-the area of nonlinear programming (NLP). Our open-source software
-packages represent a significant breakthrough in efficiently solving
+highlighting our contributions of {\bf ExaModels} \cite{examodels} and
+{\bf MadNLP} \cite{madnlp} in the field of computational
+infrastructure for operations research, specifically in the area of
+nonlinear programming (NLP). Our open-source software packages
+represent a significant breakthrough in efficiently solving
 large-scale NLPs by leveraging the capabilities of modern GPU
 hardware.  In this document, we address the primary challenges and
 opportunities for optimization software development in 2023,
@@ -29,9 +30,9 @@ tools. Finally, we discuss how our development lays the foundation for
 the advancement in various topics in operations research and unlocks
 new possibilities.
 
-\paragraph{Challenges and Opportunities}
-In recent years, the scalability of deep learning has experienced
-significant advancements, primarily due to the utilization of NVIDIA
+\paragraph{Challenges and Opportunities} In recent years, the
+scalability of deep learning has experienced significant advancements,
+primarily due to the utilization of NVIDIA
 GPUs, which have demonstrated remarkable success in constructing
 large-scale AI models. Additionally, in the public domain, GPU
 accelerators have provided a substantial portion of the computational
@@ -39,7 +40,7 @@ power for next-generation leadership HPC systems such as Frontier and
 Aurora, achieving the milestone of one exaflop per second.  While GPUs
 have proven highly effective in various scientific computing areas
 like machine learning and high-fidelity simulations, integrating them
-into constrained nonlinear programming (NLP) algorithms has encountered
+into constrained NLP algorithms has encountered
 considerable challenges. Specifically, the seamless translation of
 sparse automatic differentiation (AD) and sparse linear solver
 routines to GPU architecture has been recognized to be particularly
