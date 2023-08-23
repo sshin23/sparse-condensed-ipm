@@ -1,7 +1,7 @@
 \input{preamble}
 \usepackage{wrapfig}
-\title{ExaModels and MadNLP: Open-Source Software Infrastructure for Accelerated Nonlinear Optimization on GPUs}
-\author{Sungho Shin$^\dag$, François Pacaud$^\ddag$, and Mihai Anitescu$^\dag$} 
+\title{ExaModels and MadNLP: An Open-Source Software Infrastructure for Accelerated Nonlinear Optimization on GPUs}
+\author{Sungho Shin$^\dag$, François Pacaud$^\ddag$, and Mihai Anitescu$^\dag$}
 \date{\small
   $^\dag$Mathematics and Computer Science Division, Argonne National Laboratory\\
   $^\ddag$Centre Automatique et Systèmes, Mines Paris - PSL, Paris, France
@@ -25,22 +25,22 @@ computing. Furthermore, we emphasize the remarkable performance
 enhancements achieved in solving real-world nonlinear optimization
 problems at scale. A noteworthy example of such progress is our recent
 accomplishment in accelerating alternating current (AC) optimal power
-flow (OPF) problems by up to ten times compared to state-of-the-art
+flow (OPF) problems by up to a factor of ten compared to state-of-the-art
 tools. Finally, we discuss how our development lays the foundation for
 the advancement in various topics in operations research and unlocks
 new possibilities.
 
-\paragraph{Challenges and Opportunities} In recent years, the
+\paragraph{Challenges and Opportunities.} In recent years, the
 scalability of deep learning has experienced significant advancements,
 primarily due to the utilization of NVIDIA
 GPUs, which have demonstrated remarkable success in constructing
-large-scale AI models. Additionally, in the public domain, GPU
+large-scale AI models. Additionally, in the high-performance computing (HPC) domain, GPU
 accelerators have provided a substantial portion of the computational
 power for next-generation leadership HPC systems such as Frontier and
 Aurora, achieving the milestone of one exaflop per second.  While GPUs
 have proven highly effective in various scientific computing areas
 like machine learning and high-fidelity simulations, integrating them
-into constrained NLP algorithms has encountered
+into nonlinear optimization solvers has encountered
 considerable challenges. Specifically, the seamless translation of
 sparse automatic differentiation (AD) and sparse linear solver
 routines to GPU architecture has been recognized to be particularly
@@ -56,20 +56,20 @@ device memory hinders the ad-hoc implementation of GPU accelerations
 (Figure \ref{fig:simd}, right). To fully exploit the potential offered
 by modern GPU hardware, it is crucial to develop a comprehensive
 computational framework for optimization on GPUs. This requires
-keeping the problem data and the solver's intermediate computational
-data reside exclusively within device memory, with the majority of
+keeping both the problem data and the solver's intermediate computational
+data exclusively within device memory, with the majority of
 operations executed on the GPU. Consequently, the development of a
 comprehensive NLP solution framework that performs
-all necessary computations, including AD, optimization, and linear
-algebra, exclusively on GPUs becomes imperative.  To address these
+all necessary computations --- including AD, optimization, and linear
+algebra --- exclusively on GPUs becomes imperative.  To address these
 challenges, ExaModels and MadNLP offer a comprehensive solution
-framework for NLP. They enable AD and NLP solution
+framework for NLP. They respectively enable AD and NLP solution
 exclusively on GPUs, while linear algebra computation is performed by
-the external library (e.g., cuSOLVER), allowing for the full
+external libraries (e.g., cuSOLVER), allowing for the full
 utilization of GPUs.
 
 \begin{figure}[t]
-  \centering 
+  \centering
   \scalebox{.82}{
     \begin{tikzpicture}[remember picture, scale=.9, font=\small]
     \node[draw,align=left] (I) at (0,2.75) {
@@ -108,7 +108,7 @@ utilization of GPUs.
     \node at (-4,-2.5) {Input Data};
     \node[align=center] at (0,-2.5) {Processing Units\\(CPUs or GPUs)};
     \node at (4,-2.5) {Output Data};
-  \end{tikzpicture} 
+  \end{tikzpicture}
   }
   \scalebox{.87}{
   \begin{tikzpicture}[remember picture, scale=.9, font=\small]
@@ -151,15 +151,15 @@ utilization of GPUs.
 \end{figure}
 
 
-\paragraph{ExaModels}
+\paragraph{ExaModels.}
 
 ExaModels is an algebraic modeling and AD system embedded in the Julia
 Language, specialized for the SIMD abstraction of nonlinear
 programs. This system is designed based on the repetitive structure
 commonly found in large-scale NLPs. For example, AC OPF problems,
-which may have millions of variables and constraints, can be expressed
+which may encompass millions of variables and constraints, can be expressed
 using just 15 computational patterns. By enforcing the creation of
-models through specifying repetitive patterns, ExaModels preserves the
+models through the specification of repetitive patterns, ExaModels preserves the
 parallelizable structure within model equations and facilitates
 parallel automatic differentiation. Writing models in ExaModels
 automatically enables GPU compatibility, which is especially
@@ -174,14 +174,14 @@ provides exceptional performance, surpassing existing tools like AMPL
 (AD backend of Pyomo) and JuMP by more than two orders of
 magnitude. Our numerical results demonstrate that conventional
 algebraic modeling systems struggle to efficiently compute derivatives
-of model equations (Table \ref{tab:num}), and they are incompatible
-with GPU operations (Table \ref{tbl:portability}). In contrast,
+of model equations (Table~\ref{tab:num}), and they are incompatible
+with GPU operations (Table~\ref{tbl:portability}). In contrast,
 ExaModels provides a convenient framework for users to inform the AD
-backend about the parallelizable structure, and in turn, efficient,
-parallelized AD can be performed in the backend.
+backend about the parallelizable structure, enabling efficient
+parallelized AD in the backend.
 
 
-\paragraph{MadNLP}
+\paragraph{MadNLP.}
 
 MadNLP is a versatile NLP solver capable of
 handling various problem data structures. By leveraging the modularity
@@ -193,11 +193,11 @@ re-implementing interior point solver every time for each data types,
 which in turn ensures that the operations performed are mathematically
 equivalent to those in the mature, extensively tested existing code
 base. MadNLP has started as a port of Ipopt (an open-source nonlinear
-optimziation solver running on CPUs) in the Julia Language, but over
+optimization solver running on CPUs) in the Julia Language, but over
 the past four years, it has expanded beyond its initial scope and now
 offers a range of capabilities not supported by state-of-the-art NLP
 solvers. These include solving dense optimization problems, handling
-different numerical precisions, working with different forms of KKT
+different numerical precisions, working with different forms of Karush-Kuhn-Tucker (KKT)
 systems, managing diverse array data types (including GPU device
 arrays), and utilizing various Hessian approximation strategies, such
 as different variants of BFGS methods.
@@ -205,7 +205,7 @@ as different variants of BFGS methods.
 Recently, we have discovered that the condensed-space interior point
 method (IPM) with an inequality relaxation strategy is particularly
 effective for solving large-scale NLPs, like AC optimal power flow, up
-to moderate precisions. This strategy efficiently addresses the
+to moderate accuracy. This strategy efficiently addresses the
 challenges posed by sparse matrix factorization on GPUs, as the
 condensed KKT systems can be factorized without numerical pivoting,
 which has previously hindered GPU utilization in the large-scale
@@ -233,13 +233,13 @@ OPF \cite{pacaud2023accelerating} and model predictive control (MPC)
 \cite{cole2023exploiting}, where we have achieved similar degrees of
 speedup.
 
- 
+
 \begin{table}[t]
   \begin{center}
     \include{table}
     \vspace{-1em}
     \footnotesize
-    $^\dag$Wall time (sec) measured by Julia. $^\ddag$CPU time (sec) reported by Ipopt.  
+    $^\dag$Wall time (sec) measured by Julia. $^\ddag$CPU time (sec) reported by Ipopt.
   \end{center}
   \caption{Numerical Performance of ExaModels and MadNLP for solving AC OPF problems}
   \label{tab:num}
@@ -248,35 +248,35 @@ speedup.
 \paragraph{Portability}
 
 
-While NVIDIA currently leads in terms of computing power and mature
-implementation of low-level operations, especially with CUDA
+While NVIDIA is currently the leader in terms of computing power and mature
+implementation of low-level operations on GPUs, especially with CUDA
 libraries, we aim to provide support for alternative architectures as
-well. This is crucial because many next-generation exascale
-high-performance computing architectures will be based on AMD and
-Intel accelerator devices. Furthermore, by supporting diverse
-platforms, we hope to drive the attention of chip makers towards the
-operations research field and encourage better support for software
-infrastructure in implementing operations research software.
+well. This is crucial as many next-generation exascale HPC
+architectures will be based on AMD and Intel accelerator devices.
+Furthermore, by supporting diverse platforms, we hope to drive the attention
+of chip makers towards the operations research field and encourage better
+support for software infrastructure in implementing operations research software.
 
 Table \ref{tbl:portability} provides an overview of the current state
 of portability for our tools and other existing open-source software
-tools. ExaModels.jl already supports all major architectures, while
+tools. ExaModels.jl already supports all major architectures at
+the exception of Apple Metal, while
 MadNLP.jl currently only supports NVIDIA GPUs. However, we have a
 clear roadmap to extend support to all major accelerator
 architectures, including NVIDIA, AMD, and Intel GPUs. The portability
 is enabled by KernelAbstractions.jl, a Julia package that facilitates
-the portable implementation of GPU kernels. 
+the portable implementation of GPU kernels.
 
 \begin{table}[t]
   \begin{center}
     \scalebox{0.72}{
       \begin{tabular}{|c|c|cccccc|}
         \hline
-        &&CPU (single) &CPU (multi)& NVIDIA & AMD & Intel& Apple\\
+        &&CPU (single) &CPU (multi)& NVIDIA GPU & AMDGPU  & Intel GPU& Apple Metal\\
         \hline
         \multirow{3}{*}{Algebraic Modeling Platforms}& {\bf AMPL}& \cmark& \xmark& \xmark& \xmark& \xmark& \xmark\\
         &{\bf JuMP}& \cmark& \xmark& \xmark& \xmark& \xmark& \xmark\\
-        &{\bf ExaModels}& \cmark& \cmark& \cmark& \cmark& \cmark& \xmark\\ 
+        &{\bf ExaModels}& \cmark& \cmark& \cmark& \cmark& \cmark& \xmark\\
         \hline
         \multirow{2}{*}{NLP Solvers} & {\bf Ipopt}& \cmark& \xmark& \xmark& \xmark& \xmark& \xmark\\
         & {\bf MadNLP} & \cmark& \xmark& \cmark& \xmark& \xmark& \xmark\\
@@ -293,21 +293,21 @@ the portable implementation of GPU kernels.
 \begin{itemize}
 \item \textit{Energy Infrastructures}: Enhancing the scalability of
 optimization methods is crucial for improving the resilience of energy
-system operations. We have demonstrated the ability of MadNLP with
-multiple GPUs to solve large-scale security-constrained AC OPF
-problems effectively \cite{pacaud2023parallel}. This showcases the
+system operations. We have demonstrated the ability of MadNLP
+to solve large-scale security-constrained AC OPF
+problems effectively with multiple GPUs~\cite{pacaud2023parallel}. This showcases the
 potential of ExaModels and MadNLP to enhance the scalability of NLP by
 utilizing GPU capabilities.
 
 \item \textit{Model Predictive Control}: MPC has been widely used for
 optimization-based control in various settings, such as chemical
 processes, energy systems, and robotics. However, the effectiveness of
-MPC is often limited by the efficiency of optimization solvers,
+MPC is often limited by the latency of optimization solvers,
 especially when short sampling times are required. Our results have
 shown that MadNLP running on GPUs can solve such problems with high
 efficiency \cite{cole2023exploiting}. Moving forward, we plan to
-implement the extension packages for control problems so that control
-community can take advantage of accelerated NLP frameworks.
+implement extension packages for control problems to enable
+the control community to take advantage of accelerated NLP frameworks.
 
 \item \textit{Machine Learning Surrogate Models}: An exciting future
 direction is the integration of neural network surrogate models into
@@ -321,8 +321,8 @@ and provide extensions for surrogate modeling with GPU acceleration.
 
 \end{itemize}
 
-\paragraph{Closing Remarks} ExaModels and MadNLP provide computational
-infrastructures for operations research that align with the era of
+\paragraph{Closing Remarks.} ExaModels and MadNLP provide computational
+infrastructures for operations research that align with the new era of
 accelerated computing, which we believe the COIN-OR cup aims to
 recognize. By addressing critical challenges and introducing new
 strategies, these packages significantly extend the boundaries of
@@ -333,6 +333,6 @@ such as energy systems, control, and machine learning. With great
 enthusiasm, we nominate ExaModels and MadNLP for the COIN-OR cup, in
 recognition of their impact on the field.
 
-\bibliographystyle{plain} 
+\bibliographystyle{plain}
 \bibliography{main}
 \end{document}
