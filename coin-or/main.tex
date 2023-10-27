@@ -1,10 +1,18 @@
 \input{preamble}
 \usepackage{wrapfig}
-\title{ExaModels and MadNLP: An Open-Source Software Infrastructure for Accelerated Nonlinear Optimization on GPUs}
-\author{Sungho Shin$^\dag$, François Pacaud$^\ddag$, and Mihai Anitescu$^\dag$}
+\title{
+  \vspace{-.35in}
+  ExaModels and MadNLP: An Open-Source Software Infrastructure for Accelerated Nonlinear Optimization on GPUs
+  \vspace{-.15in}
+}
+\author{
+  Sungho Shin$^\dag$, François Pacaud$^\ddag$, and Mihai Anitescu$^\dag$
+}
 \date{\small
+  \vspace{-.1in}
   $^\dag$Mathematics and Computer Science Division, Argonne National Laboratory\\
   $^\ddag$Centre Automatique et Systèmes, Mines Paris - PSL, Paris, France
+  \vspace{-.1in}
 }
 \begin{document}
 \maketitle
@@ -15,11 +23,11 @@ highlighting our contributions of {\bf ExaModels} \cite{examodels} and
 infrastructure for operations research, specifically in the area of
 nonlinear programming (NLP). Our open-source software packages
 represent a significant breakthrough in efficiently solving
-large-scale NLPs by leveraging the capabilities of modern GPU
-hardware.  In this document, we address the primary challenges and
+large-scale NLPs by leveraging the capabilities of modern GPUs.
+In this document, we address the primary challenges and
 opportunities for optimization software development in 2023,
-particularly within the context of accelerated computing. We elucidate
-how ExaModels and MadNLP collectively address technical obstacles and
+particularly in the context of accelerated computing. We elucidate
+how ExaModels and MadNLP address technical obstacles and
 capitalize on the advantages offered by modern accelerated
 computing. Furthermore, we emphasize the remarkable performance
 enhancements achieved in solving real-world nonlinear optimization
@@ -39,7 +47,7 @@ accelerators have provided a substantial portion of the computational
 power for next-generation leadership HPC systems such as Frontier and
 Aurora, achieving the milestone of one exaflop per second.  While GPUs
 have proven highly effective in various scientific computing areas
-like machine learning and high-fidelity simulations, integrating them
+like machine learning (ML) and simulations, integrating them
 into nonlinear optimization solvers has encountered
 considerable challenges. Specifically, the seamless translation of
 sparse automatic differentiation (AD) and sparse linear solver
@@ -60,8 +68,8 @@ keeping both the problem data and the solver's intermediate computational
 data exclusively within device memory, with the majority of
 operations executed on the GPU. Consequently, the development of a
 comprehensive NLP solution framework that performs
-all necessary computations --- including AD, optimization, and linear
-algebra --- exclusively on GPUs becomes imperative.  To address these
+all necessary computations---including AD, optimization, and linear
+algebra---exclusively on GPUs becomes imperative.  To address these
 challenges, ExaModels and MadNLP offer a comprehensive solution
 framework for NLP. They respectively enable AD and NLP solution
 exclusively on GPUs, while linear algebra computation is performed by
@@ -70,7 +78,7 @@ utilization of GPUs.
 
 \begin{figure}[t]
   \centering
-  \scalebox{.82}{
+  \scalebox{.7}{
     \begin{tikzpicture}[remember picture, scale=.9, font=\small]
     \node[draw,align=left] (I) at (0,2.75) {
       $\bullet$ Instruction $g(\cdot,\cdot)$\\
@@ -110,7 +118,7 @@ utilization of GPUs.
     \node at (4,-2.5) {Output Data};
   \end{tikzpicture}
   }
-  \scalebox{.87}{
+  \scalebox{.75}{
   \begin{tikzpicture}[remember picture, scale=.9, font=\small]
 
     \fill[lightgray] (3.25,-.75) rectangle (4.75,4.75) node[black,midway,align=center,yshift=57.5] {PCIe\\Interface};
@@ -145,9 +153,11 @@ utilization of GPUs.
       }
     }
   \end{tikzpicture}
-  }
-  \caption{Schematics of host and device memory architectures (left) and SIMD parallelism (right).}
-  \label{fig:simd}
+}
+\vspace{-.075in}
+\caption{Schematics of host and device memory architectures (left) and SIMD parallelism (right).}
+\vspace{-.075in}
+\label{fig:simd}
 \end{figure}
 
 
@@ -208,28 +218,28 @@ effective for solving large-scale NLPs, like AC optimal power flow, up
 to moderate accuracy. This strategy efficiently addresses the
 challenges posed by sparse matrix factorization on GPUs, as the
 condensed KKT systems can be factorized without numerical pivoting,
-which has previously hindered GPU utilization in the large-scale
-optimization regime.  Furthermore, MadNLP offers diverse approaches
-for handling KKT systems with special structures, via reduction
-strategies \cite{pacaud2023accelerating} and Schur complement decomposition
-strategies \cite{pacaud2023parallel}.
+which has previously hindered GPU utilization.  Furthermore, MadNLP
+offers diverse approaches for handling KKT systems with special
+structures, via reduction strategies \cite{pacaud2023accelerating} and
+Schur complement decomposition strategies \cite{pacaud2023parallel}.
 
 
 
 \paragraph{Performance Highlights}
 
-Our numerical results, summarized in Table \ref{tab:num} (for detailed
-results, please refer to \cite{shin2023accelerating}), clearly
-demonstrate the significant potential of using GPUs. Specifically,
-when applied to AC OPF problems, which are one of the most important
-applications of NLP, we have achieved significant performance
-enhancements. The GPU-based solutions achieve speedups of over 10
-times compared to CPU-based state-of-the-art tools. Notably, ExaModels
-enables derivative evaluations that are up to two orders of magnitude
-faster, and the use of the condensed-space IPM strategy in MadNLP
-greatly improves linear algebra computation speed. Furthermore, we
-have also explored the utilization of these methods in reduced-space
-OPF \cite{pacaud2023accelerating} and model predictive control (MPC)
+Our numerical results for AC optimal power flow problems, summarized
+in Table \ref{tab:num} (for detailed results, please refer to
+\cite{shin2023accelerating}), clearly demonstrate the significant
+potential of using GPUs. Specifically, when applied to AC OPF
+problems, which are one of the most important applications of NLP, we
+have achieved significant performance enhancements. The GPU-based
+solutions achieve speedups of over 10 times compared to CPU-based
+state-of-the-art tools. Notably, ExaModels enables derivative
+evaluations that are up to two orders of magnitude faster, and the use
+of the condensed-space IPM strategy in MadNLP greatly improves linear
+algebra computation speed. Furthermore, we have also explored the
+utilization of these methods in reduced-space OPF
+\cite{pacaud2023accelerating} and model predictive control (MPC)
 \cite{cole2023exploiting}, where we have achieved similar degrees of
 speedup.
 
@@ -239,9 +249,10 @@ speedup.
     \include{table}
     \vspace{-1em}
     \footnotesize
-    $^\dag$Wall time (sec) measured by Julia. $^\ddag$CPU time (sec) reported by Ipopt.
   \end{center}
-  \caption{Numerical Performance of ExaModels and MadNLP for solving AC OPF problems}
+  \vspace{-.075in}
+  \caption{Solution times (sec) for solving AC OPF problems}
+  \vspace{-.075in}
   \label{tab:num}
 \end{table}
 
@@ -284,7 +295,9 @@ the portable implementation of GPU kernels.
       \end{tabular}
     }
   \end{center}
+  \vspace{-.075in}
   \caption{The current status on the portability of the NLP frameworks.}
+  \vspace{-.075in}
   \label{tbl:portability}
 \end{table}
 
@@ -293,11 +306,13 @@ the portable implementation of GPU kernels.
 \begin{itemize}
 \item \textit{Energy Infrastructures}: Enhancing the scalability of
 optimization methods is crucial for improving the resilience of energy
-system operations. We have demonstrated the ability of MadNLP
-to solve large-scale security-constrained AC OPF
-problems effectively with multiple GPUs~\cite{pacaud2023parallel}. This showcases the
-potential of ExaModels and MadNLP to enhance the scalability of NLP by
-utilizing GPU capabilities.
+system operations as the multi-period and stochastic formulations for
+energy networks are large-scale. We have recently demonstrated the
+ability of MadNLP to solve large-scale security-constrained AC OPF
+problems effectively with multiple GPUs~\cite{pacaud2023parallel}.
+This showcases the potential of accelerated computing, enabled by
+ExaModels and MadNLP, to contribute to enhancing the grid efficiency
+and resillience.
 
 \item \textit{Model Predictive Control}: MPC has been widely used for
 optimization-based control in various settings, such as chemical
@@ -307,17 +322,21 @@ especially when short sampling times are required. Our results have
 shown that MadNLP running on GPUs can solve such problems with high
 efficiency \cite{cole2023exploiting}. Moving forward, we plan to
 implement extension packages for control problems to enable
-the control community to take advantage of accelerated NLP frameworks.
+the control community to take advantage of better operations research
+software with accelerated computing capabilities.
 
 \item \textit{Machine Learning Surrogate Models}: An exciting future
 direction is the integration of neural network surrogate models into
-constrained optimization algorithms (a proof-of-concept presented in
-\cite{shin2023constrained}). GPU acceleration plays a crucial role in
-these applications, considering the complexity of real-world AI
-models. MadNLP offers the necessary capabilities through the native
-handling of device arrays as well as dense KKT systems with various
-quasi-Newton strategies. We intend to explore these problems further
-and provide extensions for surrogate modeling with GPU acceleration.
+constrained optimization algorithms (proof-of-concept in
+\cite{shin2023constrained}). The development of the new award-winning
+software OMLT represents the increasing interest in incorporating ML
+models into optimization problems \cite{ceccon2022omlt}. GPU
+acceleration will play a crucial role in these applications,
+considering the complexity of real-world AI models. MadNLP offers the
+necessary capabilities through the native handling of device arrays as 
+well as dense KKT systems with various quasi-Newton strategies. We
+intend to explore these problems further and provide extensions for
+surrogate modeling with GPU acceleration.
 
 \end{itemize}
 

@@ -1,0 +1,68 @@
+\documentclass[onecolumn,oneside,11pt]{article} 
+\usepackage[left=1in,right=1in,top=1cm,bottom=0.35in,%
+includeheadfoot,headheight=99pt,headsep=0.2in]{geometry}
+\usepackage{times,graphicx,cite,fancyhdr,amsmath,amssymb,captdef}
+\usepackage{marvosym}
+\renewcommand{\headrulewidth}{0pt}
+%----------------  page style -------------------
+\pagestyle{fancy}
+\fancyhead{}    %clear the head
+\fancyhead[L]{
+  \begin{minipage}[t]{1.8in}
+    \hspace{-0.6in}
+    \includegraphics[height=0.6in]{anl.png}
+  \end{minipage}
+}
+\fancyhead[C]{}
+\fancyhead[R]{%
+  \begin{minipage}[t]{1.7in}
+    \begin{flushleft}
+      {\scriptsize
+        \vspace{-1.1in}
+        {\bf Sungho Shin}\\
+        \vspace{0.08in}
+        {\bf Mathematics \& Computer Science Division}\\
+        Argonne National Laboratory \\
+        9700 South Cass Avenue\\
+        Lemont, IL 60439 \\
+        \vspace{0.08in}
+        \Telefon: 1-608-448-5155 \\
+        \Email: sshin@mcs.anl.gov}
+    \end{flushleft}
+  \end{minipage}
+}
+\fancyfoot{}    %clear the foot
+\fancyfoot[C]{
+  \footnotesize{A U.S. Department of Energy laboratory managed by UChicago
+    Argonne, LLC}
+}
+% ==============================================================================
+\setlength{\parskip}{2ex}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{flushleft}
+  \today
+\end{flushleft}
+
+Dear PSCC 2024 Editorial Board:
+
+I am pleased to submit our conference paper titled ``Accelerating Optimal Power Flow with GPUs: SIMD Abstraction of Nonlinear Programs and Condensed-Space Interior-Point Methods'' for consideration for publication in the PSCC 2024 conference.
+
+This manuscript, authored by Sungho Shin, François Pacaud, and Mihai Anitescu, presents a novel framework for solving alternating current (AC) optimal power flow (OPF) problems on graphics processing units (GPUs). While solving ACOPF problems on GPUs has garnered significant interest recently, the implementation of efficient solution algorithms has been hampered by the lack of efficient automatic differentiation tools and sparse linear solvers. We introduce two novel algorithmic approaches to address these challenges: single instruction, multiple data  abstraction of nonlinear programs and condensed-space interior-point methods. These new methods enable us to efficiently solve large-scale ACOPF problems efficiently on GPUs. We present numerical results, along with our open-source packages ExaModels.jl and MadNLP.jl, demonstrating that large-scale AC OPF instances can be solved up to 10 times faster than with the state-of-the-art tools running on CPUs.
+
+We kindly request permission to publish the current version of the manuscript, which spans 10 pages. While we believe the paper is presented in a concise manner; the concepts discussed (SIMD abstraction of nonlinear programs and condensed-space interior point method) necessitate ample space for a thorough explanation. Furthermore, presenting the numerical results to showcase these new capabilities requires room to include tables displaying the data. Reducing the paper length to 7 pages  would entail a significant loss of content, potentially diminishing the paper's overall impact. If further justification is needed for the additional pages, please do not hesitate to contact us.
+
+Thank you for considering our submission. We eagerly anticipate hearing from you regarding the outcome of the review process.
+
+Sincerely, 
+
+\vspace{1cm}
+Sungho Shin\\
+Postdoctoral Appointee\\
+Mathematics and Computer Science Division\\
+Argonne National Laboratory\\
+sshin@anl.gov
+
+\end{document}

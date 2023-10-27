@@ -1,0 +1,72 @@
+\begin{tabular}{|l|c|c|ccc|ccc|}
+  \hline
+  \multirow{3}{*}{\textbf{Case}}
+  & \multirow{3}{*}{\# vars}
+  & \multirow{3}{*}{\# cons}
+  & \multicolumn{3}{c|}{\textbf{MadNLP+ExaModels+cuSOLVER}}
+  & \multicolumn{3}{c|}{\textbf{Ipopt+AMPL+Ma27}}
+  \\
+  & & &\multicolumn{3}{c|}{\textbf{(GPU$^*$)}} &\multicolumn{3}{c|}{\textbf{(CPU$^{**}$)}}
+  \\
+  \cline{4-9}
+  & & 
+  & \quad \# iter \quad& \quad AD$^\dag$  \quad&  \quad total$^\dag$ \quad
+    & \quad \# iter \quad& \quad AD$^\dag$  \quad&  \quad total$^\dag$ \quad
+  \\
+  \hline
+  10480\_goc 
+  &  96.8k
+  & 150.9k
+  & 70 
+  &  0.13
+  & 14.26
+    & 64 
+      & 16.93
+                                               & 38.04
+  \\
+
+  13659\_pegase 
+  & 117.4k
+  & 170.6k
+  & 63 
+  &  0.12
+  &  7.15
+    & 64 
+      & 19.70
+                                               & 35.66
+  \\
+
+  19402\_goc 
+  & 179.6k
+  & 281.7k
+  & 79 
+  &  0.17
+  & 23.28
+    & 70 
+      & 36.50
+                                               & 95.34
+  \\
+
+  24464\_goc 
+  & 203.4k
+  & 313.6k
+  & 63 
+  &  0.11
+  & 70.63
+    & 58 
+      & 33.50
+                                               & 70.15
+  \\
+
+  30000\_goc 
+  & 208.6k
+  & 307.8k
+  & 162 
+  &  0.33
+  & 22.05
+    & 180 
+      & 101.98
+                                               & 249.81
+  \\
+    \hline  
+\end{tabular}

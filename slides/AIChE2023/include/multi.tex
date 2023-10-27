@@ -1,0 +1,110 @@
+\begin{tabular}{|l|cccc|cccc|cccc|}
+  \hline
+  &
+    \multicolumn{4}{c|}{\bf 1354pegase}
+  &
+    \multicolumn{4}{c|}{\bf 2869pegase}
+  &
+    \multicolumn{4}{c|}{\bf 9241pegase} \\
+  \hline
+  &
+    \# iter
+  & AD
+  & LA
+  & total
+  &
+    \# iter
+  & AD
+  & LA
+  & total
+  &
+    \# iter
+  & AD
+  & LA
+  & total \\
+  \hline
+  {\bf CPU$^{*}$}
+  &
+    44
+  & 2.6
+  & 4.2
+  & {7.0}
+  &
+    77
+  & 11.9
+  & 27.4
+  & {40.3}
+  &
+    136
+  & 205.6
+  & 771.8
+  & {984.1} \\
+  {\bf 1 GPU$^{**}$}
+  &
+    44
+  & 0.3
+  & 1.8
+  & {2.1}
+  &
+    93
+  & 1.1
+  & 11.7
+  & {12.8}
+  &
+    98
+  & 5.5
+  & 112.3
+  & {117.8}\\
+  {\bf 2 GPUs$^{**}$}
+  &
+    44
+  & 0.3
+  & 1.1
+  & {1.4}
+  &
+    93
+  & 0.8
+  & 7.4
+  & {8.2}
+  &
+    98
+  & 3.4
+  & 56.8
+  & {60.2}\\
+  {\bf 4 GPUs$^{**}$}
+  &
+    44
+  & 0.3
+  & 1.0
+  & {1.3}
+  &
+    93
+  & 0.8
+  & 5.7
+  & {6.5}
+  &
+    98
+  & 2.3
+  & 35.8
+  & {38.1}\\
+  {\bf 8 GPUs$^{**}$}
+  &
+    44
+  & 0.2
+  & 1.0
+  & {1.2}
+  &
+    93
+  & 0.6
+  & 5.1
+  & {5.7}
+  &
+    98
+  & 1.4
+  & 26.4
+  & {27.7}\\
+  \hline
+  {\bf \# vars} & \multicolumn{4}{c|}{20k} & \multicolumn{4}{c|}{42k} & \multicolumn{4}{c|}{139k}\\
+  {\bf \# cons} & \multicolumn{4}{c|}{53k} & \multicolumn{4}{c|}{119k} & \multicolumn{4}{c|}{404k}\\
+  \hline
+\end{tabular}
