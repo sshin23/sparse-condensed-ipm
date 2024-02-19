@@ -244,7 +244,7 @@ texcl=true % interpet comments as LaTeX
 \maketitle
 
 \begin{abstract}
-  This paper introduces a framework for solving alternating current optimal power flow (ACOPF) problems using graphics processing units (GPUs). While GPUs have demonstrated remarkable performance in various computing domains, their application in ACOPF has been limited due to challenges associated with porting sparse automatic differentiation (AD) and sparse linear solver routines to GPUs. We  address these issues with two key strategies. First, we utilize a single-instruction, multiple-data  abstraction of nonlinear programs. This approach enables the specification of model equations while preserving their parallelizable structure and, in turn, facilitates the parallel AD implementation. Second, we employ a condensed-space interior-point method (IPM) with an inequality relaxation. This technique involves condensing the Karush--Kuhn--Tucker (KKT) system into a positive definite system. This strategy offers the key advantage of being able to factorize the KKT matrix without numerical pivoting, which has hampered the parallelization of the IPM algorithm. By combining these strategies, we can perform the majority of operations on GPUs while keeping the data residing in the device memory only. Comprehensive numerical benchmark results showcase the advantage of our approach. Remarkably, our implementations—MadNLP.jl and ExaModels.jl—running on NVIDIA GPUs achieve an order of magnitude speedup compared with state-of-the-art tools running on contemporary CPUs.
+  This paper introduces a framework for solving alternating current optimal power flow (ACOPF) problems using graphics processing units (GPUs). While GPUs have demonstrated remarkable performance in various computing domains, their application in ACOPF has been limited due to challenges associated with porting sparse automatic differentiation (AD) and sparse linear solver routines to GPUs. We address these issues with two key strategies. First, we utilize a single-instruction, multiple-data abstraction of nonlinear programs. This approach enables the specification of model equations while preserving their parallelizable structure and, in turn, facilitates the parallel AD implementation. Second, we employ a condensed-space interior-point method (IPM) with an inequality relaxation. This technique involves condensing the Karush--Kuhn--Tucker (KKT) system into a positive definite system. This strategy offers the key advantage of being able to factorize the KKT matrix without numerical pivoting, which has hampered the parallelization of the IPM algorithm. By combining these strategies, we can perform the majority of operations on GPUs while keeping the data residing in the device memory only. Comprehensive numerical benchmark results showcase the advantage of our approach. Remarkably, our implementations—MadNLP.jl and ExaModels.jl—running on NVIDIA GPUs achieve an order of magnitude speedup compared with state-of-the-art tools running on contemporary CPUs.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -255,7 +255,7 @@ optimal power flow
 \section{Introduction}
 
 The adoption of graphics processing units (GPUs) in the mathematical programming community has remained
-limited. Notably, nonlinear programming (NLP) remains dependent on
+limited due to the challenges associated with parallelizing the optimization algorithms. Notably, nonlinear programming (NLP) remains dependent on
 algorithms developed in the 1990s offering limited room for parallelism.
 One of the primary challenges arises from the
 automatic differentiation (AD) of sparse model equations and the
@@ -326,7 +326,7 @@ condensed-space interior-point method (IPM) with an inequality
 relaxation strategy, which facilitates the use of highly efficient
 {\it refactorization} routines for sparse matrix factorization with
 fixed pivot sequences.
-
+
 
 While derivative evaluation can be generally cheaper than linear
 algebra operations, our numerical results on ACOPF problems show that
@@ -345,7 +345,7 @@ increase with the network's size. {\color{blue} In other words, the
 objective and constraints can be expressed in the form of iterators.}
 Numerical results reported in this paper (Table \ref{tbl:results})
 demonstrate that our proposed {\color{blue} AD strategy} can achieve
-over 20 times speedup by running on the GPU. Compared with general AD
+over {\color{blue} 10} times speedup by running {\color{blue} the AD} on the GPU. Compared with general AD
 implementations on CPUs (such as AMPL and JuMP.jl), our GPU-based
 differentiation method can be approximately 500 times faster.
 
@@ -388,7 +388,7 @@ Notably, when running on NVIDIA GPUs, our method achieves a
 the largest instance. Moreover, for the same instance, our approach
 surpasses the performance of existing tools (such as Ipopt interfaced
 with JuMP.jl) by an order of magnitude. This finding underscores the
-importance of harnessing the power of GPUs for tackling
+importance of harnessing the power of GPUs to tackle
 the computational challenges in power systems.
 
 \paragraph*{Contributions}
@@ -400,15 +400,14 @@ NLP problems, which results in an efficient implementation of
 GPU-accelerated parallel AD. Furthermore, we propose the condensed IPM
 with an inequality relaxation strategy for the first time, enabling
 the treatment of the KKT systems of NLPs without numerical pivoting,
-thus allowing the solution of sparse, large-scale NLPs (with a
-prominent example being ACOPFs) on GPUs.
+thus allowing the solution of sparse, large-scale NLPs (with a prominent example being ACOPFs) on GPUs.
 
 \paragraph*{Related Work}
 Several recent works have explored the use of GPUs for large-scale
 nonlinear optimization problems. Cao et al. \cite{cao2016augmented}
 proposed an augmented Lagrangian interior-point approach that employs
 augmented Lagrangian outer iteration and the treatment of linear
-systems using a preconditioned conjugate gradient method. Prior to the
+systems using a preconditioned conjugate gradient method. Before the
 introduction of the sparse condensed-space IPM with an inequality relaxation
 strategy, the authors  investigated the use of reduction
 strategies (state variable elimination) to treat KKT systems in a
@@ -419,7 +418,7 @@ batched with batched TRON solver \cite{lin1999newton}
 have been investigated \cite{kim2022accelerated,kim2021leveraging}.
 An NLP solver for high-performance computers  with GPU
 accelerators, called HiOP, has been under development
-\cite{hiop_techrep}, with a  scope similar to that of our solver MadNLP.jl.
+\cite{hiop_techrep}, with a scope similar to that of our solver MadNLP.jl.
  Another recent development is the hybrid (direct-iterative) KKT
 system solver specifically designed for GPUs \cite{regev2023hykkt}.
 The implementation of derivative evaluations with the exploitation of
@@ -546,7 +545,7 @@ determined based on the inertia correction procedure.
 (3) The optimization solver employs a filter line search procedure to
 determine the step size~\cite{wachter2006implementation}. The primal-dual iterate is updated by
 applying the determined step size and direction. This process is
-repeated until  satisfaction of the convergence criteria (typically based on the residual
+repeated until the satisfaction of the convergence criteria (typically based on the residual
 to the first-order optimality conditions).
 
 \subsection{Automatic Differentiation}
@@ -573,7 +572,7 @@ modeling languages. Examples of such modeling languages include JuMP,
 CasADi, and AMPL (optimization) and TensorFlow, Torch, and Flux
 (machine learning).
 
- Derivatives can be propagated through the
+Derivatives can be propagated through the
 recursive application of chain rules in two ways, forward mode and 
 reverse mode, which operate in opposite directions (respectively, from leaves to
 root and from root to leaves). Reverse-mode automatic
@@ -658,7 +657,7 @@ the factorization of the sparse KKT matrix, which requires more
 sophisticated implementations.
 
 Implementing kernel functions for the above computational patterns in
-the Julia language is straightforward, since Julia provides excellent
+the Julia language is straightforward since Julia provides excellent
 high-level interfaces for array and kernel programming for GPU
 arrays. The code can even be device-agnostic, thanks to the portable
 programming capabilities brought by KernelAbstractions.jl. All
@@ -783,11 +782,11 @@ turn, ExaModels.jl has the capability to efficiently evaluate first- and
 second-order derivatives using GPU accelerators.
 
 \subsection{Sparsity Analysis}
-The sparsity analysis is needed for determining the sparsity pattern
+The sparsity analysis is needed to determine the sparsity pattern
 of the evaluated derivatives. In the case of large-scale sparse
 problems, the initial sparsity analysis of nonlinear expressions can
 be expensive, since the sparsity should be analyzed for potentially
-millions of objective and constraints terms. Often, however, 
+millions of objective and constraint terms. Often, however, 
 these analyses are applied to the same computational patterns, and
 the time and memory spent on sparsity analysis can be significantly
 reduced if the repetitive structures are exploited.
@@ -1016,7 +1015,7 @@ strategy needs to be used with caution.
 
 The reason that the condensation strategy is particularly relevant for
 GPUs is that the matrix in \eqref{eqn:very-long-condensed} is positive
-definite upon  application of the standard inertia correction
+definite upon application of the standard inertia correction
 method. Typically, to guarantee that the computed step direction is a
 descent direction, we need a condition that
 $\text{inertia}(M_\text{aug}) = (n+5m,0,m)$. Here, inertia refers to
@@ -1056,7 +1055,7 @@ to the full KKT system, rather than the condensed system in
 \subsection{Line Search and IPM Iterations}
 
 The step size can be determined by using the line search procedure.
-Although  numerous alternative approaches exist, we follow the
+Although numerous alternative approaches exist, we follow the
 filter line search method implemented in the Ipopt solver. The line
 search procedure employed here determines the step size by performing
 a backtracking line search until a trial point satisfying sufficient
@@ -1144,7 +1143,7 @@ We compared four different configurations of NLP solution frameworks:
 \ref{config-1} is our main GPU configuration; \ref{config-2}
 represents our implementation running on CPU; and \ref{config-3} and
 \ref{config-4} are used as benchmarks. \ref{config-1} and
-\ref{config-2} share significant amount of code, especially the
+\ref{config-2} share a significant amount of code, especially the
 high-level abstractions, but they differ in how they handle the KKT
 systems. In \ref{config-1}, MadNLP.jl applies the condensed-space IPM
 along with the inequality relaxation strategy, while in
@@ -1235,7 +1234,7 @@ count is nearly the same as that of Ipopt for achieving the same level
 of accuracy in the final solution (see Table \ref{tbl:quality}).
 {\color{blue} Note that
 the constraint violation is not strictly less than the tolerance in all configurations
-as relative constraint violation is used as convergence criteria.}
+as relative (scaled) constraint violation is used for the convergence criteria.}
 This
 suggests that running mathematically equivalent operations on GPUs (by
 using a shared code base in high-level abstractions) can yield a similar
@@ -1257,14 +1256,14 @@ parallelizing AD brings significant computational gain.
 We next discuss the linear solver time. While the speedup achieved by
 linear solvers is only moderate, this has a high impact on the overall
 speedup because the linear solver time constitutes a significant
-portion of the total solution time. {\color{blue} This can be observed from Figure
-\ref{fig:speedup}; linear algebra is the only bottleneck in
-large-scale instances.  For large instances, GPUs can only achieve
-approximately 5x speedup.  These speedup ratios can vary depending on
-the instances.  For instance, for case24464\_goc, the GPU linear
-solver performance was close to that of the CPU solver.  The
-investigation of under which circumstances cuSOLVER is more effective
-warrants further research.}
+portion of the total solution time. {\color{blue} Figure
+\ref{fig:speedup} reveals that linear algebra is the only
+computational bottleneck for large-scale instances. While derivative
+evaluation and solver internal computation could achieve a 10x speedup,
+the linear algebra part can only achieve a 5x speedup even for the
+largest case. For case24464\_goc, the GPU linear solver performance
+was close to that of the CPU solver.  The investigation of under which
+circumstances cuSOLVER is more effective warrants further research.}
 
 Solver internal time could also be significantly accelerated through
 GPU utilization. We can observe that the speedup in solver internal
@@ -1350,7 +1349,7 @@ While cuSOLVER has been effective for solving the condensed KKT
 systems using LU factorization, Cholesky factorization holds promise
 for better performance due to lower computational complexity and the
 ability to reveal the inertia of the KKT system. We are
-interested in exploring other linear solvers options, such as CHOLMOD
+interested in exploring other linear solver options, such as CHOLMOD
 \cite{chen2008algorithm}, Baspacho \cite{pineda2022theseus}, and HyKKT
 \cite{regev2023hykkt}.
 

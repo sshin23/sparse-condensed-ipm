@@ -1,0 +1,4 @@
+1. We present a framework for solving nonlinear programming (NLP) on GPUs, utilizing SIMD abstraction and a condensed-space interior-point method (IPM), specially designed for running on GPUs.
+2. Benchmark results show that the proposed GPU-based approach provides up to 10x speedup compared to the state-of-the-art CPU-based tools for large-scale ACOPF problems, particularly effective when variable numbers exceed 20,000.
+3. While the method successfully accelerates computations, achieving solution precision of $10^{-4}$, the increased condition number of the condensed KKT system limits final accuracy. Further research is required to enhance precision up to $10^{-8}$ for broader applications.
+4. The proposed methods are implemented in open-source packages, ExaModels.jl and MadNLP.jl.
