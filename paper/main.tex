@@ -326,7 +326,7 @@ condensed-space interior-point method (IPM) with an inequality
 relaxation strategy, which facilitates the use of highly efficient
 {\it refactorization} routines for sparse matrix factorization with
 fixed pivot sequences.
-
+
 
 While derivative evaluation can be generally cheaper than linear
 algebra operations, our numerical results on ACOPF problems show that
@@ -335,17 +335,19 @@ using off-the-shelf AD implementations such as
 JuMP.jl~\cite{dunning2017jump} or
 AMPL~\cite{fourer1990modeling}. Instead, our method leverages a
 specialized AD implementation based on the SIMD abstraction of
-NLPs. This abstraction allows us to preserve the parallelizable structure
-within the model equations, facilitating efficient derivative
-evaluations on the GPU. The AC power flow model is particularly
-well suited for this abstraction because it involves repetitive expressions
-for each component type (e.g., buses, lines, generators) and the
-the number of computational patterns does not increase with the network's
-size. Numerical results reported in this paper demonstrate that our
-proposed strategies can achieve over 20 times speedup by running on
-the GPU. Compared with general AD implementations on CPUs (such as AMPL
-and JuMP.jl), our GPU-based differentiation method can be
-approximately 500 times faster.
+NLPs. This abstraction allows us to preserve the parallelizable
+structure within the model equations, facilitating efficient
+derivative evaluations on the GPU. The AC power flow model is
+particularly well suited for this abstraction because it involves
+repetitive expressions for each component type (e.g., buses, lines,
+generators) and the the number of computational patterns does not
+increase with the network's size. {\color{blue} In other words, the
+objective and constraints can be expressed in the form of iterators.}
+Numerical results reported in this paper (Table \ref{tbl:results})
+demonstrate that our proposed {\color{blue} AD strategy} can achieve
+over 20 times speedup by running on the GPU. Compared with general AD
+implementations on CPUs (such as AMPL and JuMP.jl), our GPU-based
+differentiation method can be approximately 500 times faster.
 
 Linear algebra operations, especially sparse indefinite matrix
 factorization, are typically the bottleneck in NLP solution methods.
@@ -1149,10 +1151,9 @@ along with the inequality relaxation strategy, while in
 \ref{config-2}, MadNLP.jl applies IPM based on the indefinite,
 noncondensed KKT system, as in \eqref{eqn:kkt-indefinite}. In
 \ref{config-1}, we use the cuSOLVER library to solve the condensed KKT
-system. The initial symbolic factorization is performed on the CPU by using the KLU
-package \cite{davis2010algorithm}, and the subsequent numerical
+system via Cholesky factorization. The numerical
 factorization and triangular solves are performed by cuSOLVER with the
-fixed pivot sequence from KLU.  Software and hardware details of each
+fixed pivot sequence obtained with an approximate minimum degree ordering algorithm \cite{amestoyApproximateMinimumDegree1996}, implemented in AMD.jl \cite{montoisonAMDJlJulia2020}.  Software and hardware details of each
 configuration are illustrated in Table \ref{tbl:settings}. The ACOPF
 problem is formulated by using the model from the rosetta-opf project
 \cite{rosetta-opf}, which is based on the models in PowerModels.jl \cite{8442948}, and the test cases are obtained from the pglib-opf
@@ -1231,7 +1232,11 @@ When comparing the solvers' performance in terms of the
 IPM iteration counts, MadNLP.jl is as
 efficient as the state-of-the-art solver Ipopt. The IPM iteration
 count is nearly the same as that of Ipopt for achieving the same level
-of accuracy in the final solution (see Table \ref{tbl:quality}). This
+of accuracy in the final solution (see Table \ref{tbl:quality}).
+{\color{blue} Note that
+the constraint violation is not strictly less than the tolerance in all configurations
+as relative constraint violation is used as convergence criteria.}
+This
 suggests that running mathematically equivalent operations on GPUs (by
 using a shared code base in high-level abstractions) can yield a similar
 degree of effectiveness in terms of IPM convergence.
@@ -1243,20 +1248,23 @@ routines implemented in AMPL or JuMP.jl. Indeed, ExaModels.jl generates
 derivative functions specifically compiled for the type of model,
 including optimization for the distinctive computational pattern found
 in the model. When comparing ExaModels.jl running on CPUs and GPUs, we
-observe a further speedup on the GPU of up to almost 20x for large
-instances (e.g., case24465\_goc); remarkably, this is 500 times faster
+observe a further speedup on the GPU of up to 10x for large
+instances (e.g., case30000\_goc); remarkably, this is 300 times faster
 than JuMP.jl. This demonstrates that adopting SIMD abstraction and
 parallelizing AD brings significant computational gain. 
 
 \paragraph*{Performance of the Condensed-Space IPM}
 We next discuss the linear solver time. While the speedup achieved by
 linear solvers is only moderate, this has a high impact on the overall
-speedup because the linear solver time constitutes a significant portion of
-the total solution time. For large instances, approximately 4x speedup
-can be achieved, although this can vary depending on the instances. For
-example, for case24464\_goc, the GPU linear solver was slower than the
-CPUs. The investigation of under which circumstances cuSOLVER is
-more effective warrants further research.
+speedup because the linear solver time constitutes a significant
+portion of the total solution time. {\color{blue} This can be observed from Figure
+\ref{fig:speedup}; linear algebra is the only bottleneck in
+large-scale instances.  For large instances, GPUs can only achieve
+approximately 5x speedup.  These speedup ratios can vary depending on
+the instances.  For instance, for case24464\_goc, the GPU linear
+solver performance was close to that of the CPU solver.  The
+investigation of under which circumstances cuSOLVER is more effective
+warrants further research.}
 
 Solver internal time could also be significantly accelerated through
 GPU utilization. We can observe that the speedup in solver internal
@@ -1270,7 +1278,9 @@ all components (derivative evaluation, linear algebra, and solver
 internal computation) resulting in substantial gains in total solution
 time. The results indicate that GPUs become more effective for
 large-scale instances, particularly when the number of variables is
-greater than 20,000. Notably, for the largest instance,
+greater than 20,000. {\color{blue} This is because the benefit of parallelization
+is greater for operations over large data.}
+Notably, for the largest instance,
 case30000\_goc, our GPU implementation is 4 times faster than our CPU
 implementation and approximately 10 times faster than
 state-of-the-art tools (Ipopt, JuMP.jl, and Ma27).
@@ -1299,10 +1309,10 @@ OPF problems. By leveraging the SIMD abstraction of NLPs and a
 condensed-space IPM, we have effectively eliminated the need for
 serial computations, enabling the implementation of a solution
 framework that can run entirely on GPUs. Our method has demonstrated
-promising results, achieving a 4x speedup when compared with CPU
+promising results, achieving a 5x speedup when compared with CPU
 implementations for large-scale ACOPF problems. Notably, our approach
 outperforms one of the state-of-the-art CPU-based implementations by
-a factor of 10. These results, along with our packages
+a factor of 12. These results, along with our packages
 MadNLP.jl and ExaModels.jl, showcase a significant advancement in our
 capabilities in dealing with large-scale optimization problems in
 power systems and underscore the potential of accelerated computing in
